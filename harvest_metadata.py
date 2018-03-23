@@ -7,6 +7,7 @@ def main():
     parser.add_argument("-p", "--parentnamespace", dest="parent_namespace", help="parent namespace of collection")
     parser.add_argument("-dc", "--dcfield", dest="dc_field", help="grab pids according to dc field")
     parser.add_argument("-dcs", "--dcstring", dest="dc_string", help="specify a dc string")
+    parser.add_argument("-ds", "--dsid", dest="datastream_id", help="specify text datastream.")
     args = parser.parse_args()
 
     settings = yaml.load(open("config.yml", "r"))
@@ -21,12 +22,15 @@ def main():
         dc_parameter = f"{args.dc_field}%7E%27{args.dc_string}%27"
     elif args.dc_field or args.dc_string:
         print(f"Must include both a dc field and a dc string.")
+    dsid = None
+    if args.datastream_id:
+        dsid = args.datastream_id
 
     my_request = f"{fedora_url}:8080/fedora/objects?query={fedora_collection}{dc_parameter}" \
                  f"&pid=true&resultFormat=xml".replace(" ", "%20")
     my_records = Set(my_request, settings)
     my_records.populate()
-    my_records.harvest_metadata()
+    my_records.harvest_metadata(dsid)
     print(my_records.size_of_set())
 
 if __name__ == "__main__": main()

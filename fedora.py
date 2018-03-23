@@ -32,14 +32,16 @@ class Set:
         else:
             return f"Added {self.results} to cluster."
 
-    def harvest_metadata(self):
+    def harvest_metadata(self, dsid=None):
+        if dsid is None:
+            dsid = self.settings["default_dsid"]
         if self.settings["destination_directory"] in os.listdir("."):
             pass
         else:
             os.mkdir(self.settings["destination_directory"])
         for result in self.results:
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
-                             f"datastreams/{self.settings['default_dsid']}/content",
+                             f"datastreams/{dsid}/content",
                              auth=(f"settings['username']", f"settings['password']"))
             new_name = result.replace(":", "_")
             with open(f"{self.settings['destination_directory']}/{new_name}", "w") as new_file:
