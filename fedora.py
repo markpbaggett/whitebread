@@ -55,7 +55,6 @@ class Set:
         if dsid is None:
             dsid = self.settings["default_dsid"]
         ext = get_extension(dsid)
-        print(ext)
         for result in self.results:
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
