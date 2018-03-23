@@ -69,8 +69,8 @@ class Set:
         successes = 0
         for result in self.results:
             r = requests.post(f"{self.settings['fedora_path']}:{self.settings['port']}/fedoragsearch/rest?"
-                              f"operation=updateIndex&action=fromPid&value={result}", auth=(self.settings["username"],
-                                                                                            self.settings["password"]))
+                              f"operation=updateIndex&action=fromPid&value={result}",
+                              auth=(self.settings["gsearch_username"], self.settings["gsearch_password"]))
             if r.status_code == "200":
                 successes += 1
         print(f"Successfully updated {successes} records.")
