@@ -39,12 +39,14 @@ class Set:
             pass
         else:
             os.mkdir(self.settings["destination_directory"])
+        ext = get_extension(dsid)
         for result in self.results:
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
                              auth=(f"settings['username']", f"settings['password']"))
             new_name = result.replace(":", "_")
-            with open(f"{self.settings['destination_directory']}/{new_name}", "w") as new_file:
+            print(f"Downloading {dsid} for {result}.")
+            with open(f"{self.settings['destination_directory']}/{new_name}{ext}", "w") as new_file:
                 new_file.write(r.text)
 
     def grab_binaries(self, dsid=None):
@@ -59,6 +61,7 @@ class Set:
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
                              auth=(f"settings['username']", f"settings['password']"))
+            print(f"Downloading the {dsid} datastream for {result}.")
             in_file = Image.open(BytesIO(r.content))
             new_name = result.replace(":", "_")
             in_file.save(f"{self.settings['destination_directory']}/{new_name}{ext}")
@@ -72,9 +75,12 @@ class Set:
             r = requests.post(f"{self.settings['fedora_path']}:{self.settings['port']}/fedoragsearch/rest?"
                               f"operation=updateIndex&action=fromPid&value={result}",
                               auth=(self.settings["gsearch_username"], self.settings["gsearch_password"]))
-            if r.status_code == "200":
+            if r.status_code == 200:
                 successes += 1
-        print(f"Successfully updated {successes} records.")
+                print(f"Successfully updated record for {result} with gSearch.")
+            else:
+                print(f"Failed to update gsearch for {result} with {r.status_code} status code.")
+        print(f"\nSuccessfully updated {successes} records.")
         return
 
 
@@ -83,6 +89,9 @@ def get_extension(dsid):
         "TN": ".jpg",
         "OBJ": ".tif",
         "JP2": ".jp2",
-        "JPG": ".jpg"
+        "JPG": ".jpg",
+        "MODS": ".xml",
+        "DC": ".xml",
+        "TRANSCRIPT": ".txt"
     }
     return datastream_extensions[dsid]
