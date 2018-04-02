@@ -3,7 +3,6 @@ import requests
 import os
 from PIL import Image
 from io import BytesIO
-import rdflib
 
 
 class Set:
