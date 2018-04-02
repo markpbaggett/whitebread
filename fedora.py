@@ -3,6 +3,7 @@ import requests
 import os
 from PIL import Image
 from io import BytesIO
+import rdflib
 
 
 class Set:
@@ -82,6 +83,42 @@ class Set:
                 print(f"Failed to update gsearch for {result} with {r.status_code} status code.")
         print(f"\nSuccessfully updated {successes} records.")
         return
+
+    def mark_as_missing(self, dsid=None):
+        missing = []
+        for i in self.results:
+            r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
+                             f"objects/{i}/datastreams/{dsid}", auth=(f"{self.settings['username']}",
+                                                                      f"{self.settings['password']}"))
+            if r.status_code != 200:
+                missing.append(i)
+        print(f"{len(missing)} of {len(self.results)} were missing a {dsid} datastream.")
+        return missing
+
+    def get_relationships(self):
+        for i in self.results:
+            r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
+                             f"objects/{i}/relationships", auth=(f"{self.settings['username']}",
+                                                                      f"{self.settings['password']}"))
+            if r.status_code == 200:
+                print(r.text)
+
+    def find_is_member_of(self):
+        membership_list = []
+        for i in self.results:
+            predicate = "&predicate=info:fedora/fedora-system:def/relations-external#" \
+                        "isMemberOf".replace(":", "%3a").replace("/", "%2f").replace("#", "%23")
+            r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
+                             f"objects/{i}/relationships?subject=info%3afedora%2f{i}&format=turtle{predicate}",
+                             auth=(f"{self.settings['username']}", f"{self.settings['password']}"))
+            if r.status_code == 200:
+                new_list = r.text.split(">")
+                if len(new_list) == 4:
+                    new_item = {"pid": i,
+                                "isMemberOf": new_list[2].replace("<info:fedora/", "").replace(" ", "")}
+                    membership_list.append(new_item)
+        print(membership_list)
+        return membership_list
 
 
 def get_extension(dsid):

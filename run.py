@@ -9,9 +9,31 @@ def choose_operation(choice, instance, ds=None):
         instance.update_gsearch()
     elif choice == "harvest_metadata":
         instance.harvest_metadata(ds)
+    elif choice == "find_missing":
+        instance.mark_as_missing(ds)
+    elif choice == "get_relationships":
+        instance.get_relationships()
+    elif choice == "find_bad_books":
+        all_memberships = instance.find_is_member_of()
+        objects_missing_dsid = instance.mark_as_missing(ds)
+        items_to_remove = []
+        for i in objects_missing_dsid:
+            x = review_memberships(i, all_memberships)
+            if x not in items_to_remove and x is not None:
+                items_to_remove.append(x)
+        for i in all_memberships:
+            for j in items_to_remove:
+                if i["isMemberOf"] == j and i["pid"] not in items_to_remove:
+                    items_to_remove.append(i["pid"])
+        print(f"Here is a list of objects that have parts missing a {ds}: {items_to_remove}")
+
     else:
         print("No valid operator.")
 
+def review_memberships(item, membership_list):
+    for i in membership_list:
+        if i["pid"] == item:
+            return i["isMemberOf"]
 
 
 def main():
@@ -21,7 +43,8 @@ def main():
     parser.add_argument("-dcs", "--dcstring", dest="dc_string", help="specify a dc string")
     parser.add_argument("-ds", "--dsid", dest="datastream_id", help="specify text datastream.")
     parser.add_argument("-o", "--operation", dest="operation", help="Choose one: grab_binaries, harvest_metadata, "
-                                                                    "update_gsearch", required=True)
+                                                                    "update_gsearch, find_missing, get_relationships,"
+                                                                    "find_bad_books",required=True)
     args = parser.parse_args()
 
     settings = yaml.load(open("config.yml", "r"))
