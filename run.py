@@ -13,6 +13,8 @@ def choose_operation(choice, instance, ds=None):
         instance.mark_as_missing(ds)
     elif choice == "get_relationships":
         instance.get_relationships()
+    elif choice == "paul":
+        instance.find_is_member_of()
     elif choice == "find_bad_books":
         all_memberships = instance.find_is_member_of()
         objects_missing_dsid = instance.mark_as_missing(ds)
@@ -25,7 +27,11 @@ def choose_operation(choice, instance, ds=None):
             for j in items_to_remove:
                 if i["isMemberOf"] == j and i["pid"] not in items_to_remove:
                     items_to_remove.append(i["pid"])
-        print(f"Here is a list of objects that have parts missing a {ds}: {items_to_remove}")
+        print(f"Here is a list of objects that have parts missing a {ds}:")
+        total = 1
+        for i in items_to_remove:
+            print(f"{total}. {i}")
+            total += 1
 
     else:
         print("No valid operator.")
