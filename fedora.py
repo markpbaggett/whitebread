@@ -84,6 +84,7 @@ class Set:
         return
 
     def mark_as_missing(self, dsid=None):
+        print(f"Finding results that are missing a {dsid} datastream.")
         missing = []
         for i in self.results:
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
@@ -104,6 +105,7 @@ class Set:
 
     def find_is_member_of(self):
         membership_list = []
+        print("Finding isMemberOf objects for items in result list.")
         for i in self.results:
             predicate = "&predicate=info:fedora/fedora-system:def/relations-external#" \
                         "isMemberOf".replace(":", "%3a").replace("/", "%2f").replace("#", "%23")
