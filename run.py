@@ -18,7 +18,7 @@ def choose_operation(choice, instance, ds=None, predicate=None):
     elif choice == "find_bad_books":
         if predicate is None:
             predicate = "isMemberOf"
-        all_memberships = instance.find_rels_ext_relationship()
+        all_memberships = instance.find_rels_ext_relationship(predicate)
         objects_missing_dsid = instance.mark_as_missing(ds)
         items_to_remove = []
         for i in objects_missing_dsid:
@@ -75,7 +75,6 @@ def main():
     dsid = None
     if args.datastream_id:
         dsid = args.datastream_id
-
     my_request = f"{fedora_url}:8080/fedora/objects?query={fedora_collection}{dc_parameter}" \
                  f"&pid=true&resultFormat=xml".replace(" ", "%20")
     my_records = Set(my_request, settings)
