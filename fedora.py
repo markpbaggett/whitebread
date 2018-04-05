@@ -103,20 +103,21 @@ class Set:
             if r.status_code == 200:
                 print(r.text)
 
-    def find_is_member_of(self):
+    def find_rels_ext_relationship(self, relationship):
         membership_list = []
-        print("Finding isMemberOf objects for items in result list.")
+        print(f"Finding {relationship} objects for items in result list.")
         for i in self.results:
             predicate = "&predicate=info:fedora/fedora-system:def/relations-external#" \
-                        "isMemberOf".replace(":", "%3a").replace("/", "%2f").replace("#", "%23")
+                        f"{relationship}".replace(":", "%3a").replace("/", "%2f").replace("#", "%23")
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
                              f"objects/{i}/relationships?subject=info%3afedora%2f{i}&format=turtle{predicate}",
                              auth=(f"{self.settings['username']}", f"{self.settings['password']}"))
             if r.status_code == 200:
+                print(r.text)
                 new_list = r.text.split(">")
                 if len(new_list) == 4:
                     new_item = {"pid": i,
-                                "isMemberOf": new_list[2].replace("<info:fedora/", "").replace(" ", "")}
+                                f"{relationship}": new_list[2].replace("<info:fedora/", "").replace(" ", "")}
                     membership_list.append(new_item)
         print(membership_list)
         return membership_list

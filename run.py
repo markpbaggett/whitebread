@@ -2,7 +2,7 @@ import yaml
 import argparse
 from fedora import Set
 
-def choose_operation(choice, instance, ds=None):
+def choose_operation(choice, instance, ds=None, predicate=None):
     if choice == "grab_binaries":
         instance.grab_binaries(ds)
     elif choice == "update_gsearch":
@@ -14,18 +14,20 @@ def choose_operation(choice, instance, ds=None):
     elif choice == "get_relationships":
         instance.get_relationships()
     elif choice == "paul":
-        instance.find_is_member_of()
+        instance.find_rels_ext_relationship()
     elif choice == "find_bad_books":
-        all_memberships = instance.find_is_member_of()
+        if predicate is None:
+            predicate = "isMemberOf"
+        all_memberships = instance.find_rels_ext_relationship()
         objects_missing_dsid = instance.mark_as_missing(ds)
         items_to_remove = []
         for i in objects_missing_dsid:
-            x = review_memberships(i, all_memberships)
+            x = review_memberships(i, all_memberships, predicate)
             if x not in items_to_remove and x is not None:
                 items_to_remove.append(x)
         for i in all_memberships:
             for j in items_to_remove:
-                if i["isMemberOf"] == j and i["pid"] not in items_to_remove:
+                if i[predicate] == j and i["pid"] not in items_to_remove:
                     items_to_remove.append(i["pid"])
         print(f"Here is a list of objects that have parts missing a {ds}:")
         total = 1
@@ -36,10 +38,10 @@ def choose_operation(choice, instance, ds=None):
     else:
         print("No valid operator.")
 
-def review_memberships(item, membership_list):
+def review_memberships(item, membership_list, rel):
     for i in membership_list:
         if i["pid"] == item:
-            return i["isMemberOf"]
+            return i[rel]
 
 
 def main():
@@ -51,11 +53,15 @@ def main():
     parser.add_argument("-o", "--operation", dest="operation", help="Choose one: grab_binaries, harvest_metadata, "
                                                                     "update_gsearch, find_missing, get_relationships,"
                                                                     "find_bad_books",required=True)
+    parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
     args = parser.parse_args()
 
     settings = yaml.load(open("config.yml", "r"))
 
     fedora_collection = dc_parameter = ""
+    relationship = None
+    if args.relationship:
+        relationship = args.relationship
     fedora_url = settings["fedora_path"]
     if not fedora_url.startswith("http"):
         fedora_url = f"http://{fedora_url}"
@@ -74,6 +80,6 @@ def main():
                  f"&pid=true&resultFormat=xml".replace(" ", "%20")
     my_records = Set(my_request, settings)
     my_records.populate()
-    choose_operation(operation, my_records, dsid)
+    choose_operation(operation, my_records, dsid, relationship)
 
 if __name__ == "__main__": main()
