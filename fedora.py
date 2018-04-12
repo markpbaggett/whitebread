@@ -44,10 +44,13 @@ class Set:
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
                              auth=(f"settings['username']", f"settings['password']"))
-            new_name = result.replace(":", "_")
-            print(f"Downloading {dsid} for {result}.")
-            with open(f"{self.settings['destination_directory']}/{new_name}{ext}", "w") as new_file:
-                new_file.write(r.text)
+            if r.status_code == 200:
+                new_name = result.replace(":", "_")
+                print(f"Downloading {dsid} for {result}.")
+                with open(f"{self.settings['destination_directory']}/{new_name}{ext}", "w") as new_file:
+                    new_file.write(r.text)
+            else:
+                print(f"Could not harvest metadata for {result}: {r.status_code}.")
 
     def grab_binaries(self, dsid=None):
         if self.settings["destination_directory"] in os.listdir("."):
@@ -121,6 +124,9 @@ class Set:
                     membership_list.append(new_item)
         print(membership_list)
         return membership_list
+
+class log_file:
+    def __init__(self, log_location="logs/whitebread.log"):
 
 
 def get_extension(dsid):

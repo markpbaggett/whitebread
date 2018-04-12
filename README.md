@@ -4,7 +4,7 @@ Simple python scripts for those everyday, mundane Fedora tasks.
 
 ## Installing
 
-## Harvesting Metadata!
+## Harvest Metadata!
 
 **By Matching Parent Namespace:**
 ```
@@ -23,7 +23,7 @@ Simple python scripts for those everyday, mundane Fedora tasks.
 >>> python run.py -o harvest_metadata -p smhc -ds DC
 ```
 
-## Downloading Binaries!
+## Download Binaries!
 
 **Just like above examples but with a different operator (use for things that aren't text).**
 
@@ -31,7 +31,7 @@ Simple python scripts for those everyday, mundane Fedora tasks.
 >>> python run.py -o grab_binaries -p smhc -ds OBJ
 ```
 
-## Updating GSearch!
+## Update GSearch!
 
 **You guessed it!**
 
