@@ -52,7 +52,7 @@ class Set:
             else:
                 print(f"Could not harvest metadata for {result}: {r.status_code}.")
 
-    def grab_binaries(self, dsid=None):
+    def grab_images(self, dsid=None):
         if self.settings["destination_directory"] in os.listdir("."):
             pass
         else:

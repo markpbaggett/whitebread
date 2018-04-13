@@ -3,8 +3,8 @@ import argparse
 from fedora import Set
 
 def choose_operation(choice, instance, ds=None, predicate=None):
-    if choice == "grab_binaries":
-        instance.grab_binaries(ds)
+    if choice == "grab_images":
+        instance.grab_images(ds)
     elif choice == "update_gsearch":
         instance.update_gsearch()
     elif choice == "harvest_metadata":
@@ -50,7 +50,7 @@ def main():
     parser.add_argument("-dc", "--dcfield", dest="dc_field", help="grab pids according to dc field")
     parser.add_argument("-dcs", "--dcstring", dest="dc_string", help="specify a dc string")
     parser.add_argument("-ds", "--dsid", dest="datastream_id", help="specify text datastream.")
-    parser.add_argument("-o", "--operation", dest="operation", help="Choose one: grab_binaries, harvest_metadata, "
+    parser.add_argument("-o", "--operation", dest="operation", help="Choose one: grab_images, harvest_metadata, "
                                                                     "update_gsearch, find_missing, get_relationships,"
                                                                     "find_bad_books",required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
