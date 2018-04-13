@@ -15,6 +15,9 @@ def choose_operation(choice, instance, ds=None, predicate=None):
         instance.get_relationships()
     elif choice == "grab_other":
         instance.grab_other(ds)
+    elif choice == "find_matching_relationship":
+        memberships = instance.find_rels_ext_relationship(predicate)
+        print(memberships)
     elif choice == "find_bad_books":
         if predicate is None:
             predicate = "isMemberOf"
