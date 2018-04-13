@@ -127,6 +127,14 @@ class Set:
 
 class log_file:
     def __init__(self, log_location="logs/whitebread.log"):
+        self.location = log_location
+
+    def append(self, message):
+        try:
+            with open(self.location, "a") as file:
+                file.write(message)
+        except:
+            print(f"Can't write to {self.location}.")
 
 
 def get_extension(dsid):
