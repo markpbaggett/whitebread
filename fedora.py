@@ -69,6 +69,26 @@ class Set:
             new_name = result.replace(":", "_")
             in_file.save(f"{self.settings['destination_directory']}/{new_name}{ext}")
 
+    def grab_other(self, dsid=None):
+        if self.settings["destination_directory"] in os.listdir("."):
+            pass
+        else:
+            os.mkdir(self.settings["destination_directory"])
+        if dsid is None:
+            dsid = self.settings["default_dsid"]
+        ext = get_extension(dsid)
+        for result in self.results:
+            r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
+                             f"datastreams/{dsid}/content",
+                             auth=(f"settings['username']", f"settings['password']"))
+            if r.status_code == 200:
+                print(f"Downloading the {dsid} datastream for {result}.")
+                new_name = result.replace(":", "_")
+                with open(f"{self.settings}['destination_directory']/{new_name}{ext}", 'wb') as other:
+                    other.write(r.content)
+            else:
+                print(f"Failed to download {dsid} for {result} with {r.status_code}.")
+
     def size_of_set(self):
         return f"Total records: {len(self.results)}"
 
