@@ -13,8 +13,8 @@ def choose_operation(choice, instance, ds=None, predicate=None):
         instance.mark_as_missing(ds)
     elif choice == "get_relationships":
         instance.get_relationships()
-    elif choice == "paul":
-        instance.find_rels_ext_relationship()
+    elif choice == "grab_other":
+        instance.grab_other(ds)
     elif choice == "find_bad_books":
         if predicate is None:
             predicate = "isMemberOf"
@@ -34,7 +34,6 @@ def choose_operation(choice, instance, ds=None, predicate=None):
         for i in items_to_remove:
             print(f"{total}. {i}")
             total += 1
-
     else:
         print("No valid operator.")
 

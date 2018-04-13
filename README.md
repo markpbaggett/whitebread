@@ -23,12 +23,19 @@ Simple python scripts for those everyday, mundane Fedora tasks.
 >>> python run.py -o harvest_metadata -p smhc -ds DC
 ```
 
+## Grab Images
+
+** Like above, but for image mime types **
+```
+>>> python run.py -p smhc -o grab_images -ds JP2
+```
+
 ## Download Binaries!
 
-**Just like above examples but with a different operator (use for things that aren't text).**
+**Just like above examples but with a different operator (use for things that aren't images or test).**
 
 ```
->>> python run.py -o grab_binaries -p smhc -ds OBJ
+>>> python run.py -o grab_other -p smhc -ds PDF
 ```
 
 ## Update GSearch!
