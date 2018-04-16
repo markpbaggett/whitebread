@@ -18,6 +18,11 @@ def choose_operation(choice, instance, ds=None, predicate=None):
     elif choice == "find_matching_relationship":
         memberships = instance.find_rels_ext_relationship(predicate)
         print(memberships)
+    elif choice == "harvest_metadata_no_pages":
+        memberships = instance.find_rels_ext_relationship("isMemberOf")
+        for pid in memberships:
+            instance.results.remove(pid["pid"])
+        instance.harvest_metadata(ds)
     elif choice == "find_bad_books":
         if predicate is None:
             predicate = "isMemberOf"
@@ -54,7 +59,7 @@ def main():
     parser.add_argument("-ds", "--dsid", dest="datastream_id", help="specify text datastream.")
     parser.add_argument("-o", "--operation", dest="operation", help="Choose one: grab_images, harvest_metadata, "
                                                                     "update_gsearch, find_missing, get_relationships,"
-                                                                    "find_bad_books",required=True)
+                                                                    "find_bad_books, harvest_metadata_no_pages",required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
     args = parser.parse_args()
 

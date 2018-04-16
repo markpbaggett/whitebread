@@ -136,7 +136,7 @@ class Set:
                              f"objects/{i}/relationships?subject=info%3afedora%2f{i}&format=turtle{predicate}",
                              auth=(f"{self.settings['username']}", f"{self.settings['password']}"))
             if r.status_code == 200:
-                print(r.text)
+                #print(r.text)
                 new_list = r.text.split(">")
                 if len(new_list) == 4:
                     new_item = {"pid": i,
@@ -144,6 +144,7 @@ class Set:
                     membership_list.append(new_item)
         print(membership_list)
         return membership_list
+
 
 class log_file:
     def __init__(self, log_location="logs/whitebread.log"):
