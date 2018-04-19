@@ -9,6 +9,7 @@ def choose_operation(choice, instance, ds=None, predicate=None):
         instance.update_gsearch()
     elif choice == "harvest_metadata":
         instance.harvest_metadata(ds)
+        print(f"\n\nDownloaded {len(instance.results)} {ds} records.")
     elif choice == "find_missing":
         instance.mark_as_missing(ds)
     elif choice == "get_relationships":
@@ -23,6 +24,7 @@ def choose_operation(choice, instance, ds=None, predicate=None):
         for pid in memberships:
             instance.results.remove(pid["pid"])
         instance.harvest_metadata(ds)
+        print(f"\n\nDownloaded {len(instance.results)} {ds} records.")
     elif choice == "find_bad_books":
         if predicate is None:
             predicate = "isMemberOf"
