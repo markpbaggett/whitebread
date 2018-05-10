@@ -60,8 +60,9 @@ def main():
     parser.add_argument("-dcs", "--dcstring", dest="dc_string", help="specify a dc string")
     parser.add_argument("-ds", "--dsid", dest="datastream_id", help="specify text datastream.")
     parser.add_argument("-o", "--operation", dest="operation", help="Choose one: grab_images, harvest_metadata, "
-                                                                    "update_gsearch, find_missing, get_relationships,"
-                                                                    "find_bad_books, harvest_metadata_no_pages",required=True)
+                                                                    "grab_other, update_gsearch, find_missing, "
+                                                                    "get_relationships, find_bad_books, "
+                                                                    "harvest_metadata_no_pages",required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
     args = parser.parse_args()
 

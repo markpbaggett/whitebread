@@ -84,7 +84,7 @@ class Set:
             if r.status_code == 200:
                 print(f"Downloading the {dsid} datastream for {result}.")
                 new_name = result.replace(":", "_")
-                with open(f"{self.settings}['destination_directory']/{new_name}{ext}", 'wb') as other:
+                with open(f"{self.settings['destination_directory']}/{new_name}{ext}", 'wb') as other:
                     other.write(r.content)
             else:
                 print(f"Failed to download {dsid} for {result} with {r.status_code}.")
