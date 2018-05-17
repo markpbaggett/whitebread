@@ -11,6 +11,12 @@ class Image:
         print(f"Converting {self.name} to {output}{extension}.")
         call(f"convert {self.name} -colorspace {colorspace} -resize '{resize}' {output}{extension}", shell=True)
 
+    def pdf_to_thumb(self):
+        output = self.name.split('.', maxsplit=1)[0]
+        print(f"Converting {self.name} to {output}{extension}.")
+        call(f"convert -thumbnail x250 -alpha remove '{self.name}[0]' {output}.jpg", shell=True)
+
+
 def main():
     settings = yaml.load(open("config.yml", "r"))
     for path in os.walk(settings["destination_directory"]):
