@@ -13,12 +13,12 @@ class Image:
         print(f"Converting {self.name} to {output}{extension}.")
         call(f"convert {self.name} -colorspace {colorspace} -resize '{resize}' {output}{extension}", shell=True)
 
-    def pdf_to_thumb(self):
+    def pdf_to_thumb(self, extension=".png"):
         output = self.name.split('.', maxsplit=1)[0]
         print(f"Converting {self.name} to {output}{extension}.")
         call(f"convert -thumbnail x250 -alpha remove '{self.name}[0]' {output}.jpg", shell=True)
 
-    def preview_to_thumb(self):
+    def preview_to_thumb(self, extension=".png"):
         output = self.name.split('.', maxsplit=1)[0]
         print(f"Converting {self.name} to {output}{extension}.")
         call(f"convert -thumbnail x600 -alpha remove '{self.name}[0]' {output}.jpg", shell=True)
