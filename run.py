@@ -12,6 +12,8 @@ def choose_operation(choice, instance, ds=None, predicate=None):
         print(f"\n\nDownloaded {len(instance.results)} {ds} records.")
     elif choice == "find_missing":
         instance.mark_as_missing(ds)
+    elif choice == "list_dsids":
+        instance.list_dsids()
     elif choice == "get_relationships":
         instance.get_relationships()
     elif choice == "grab_other":

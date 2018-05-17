@@ -144,6 +144,15 @@ class Set:
         print(membership_list)
         return membership_list
 
+    def list_dsids(self):
+        for result in self.results:
+            print(f"Finding dsids for {result}.\n")
+            r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}"
+                             f"/datastreams?profiles=true", auth=(f"{self.settings['username']}", f"{self.settings['password']}"))
+            if r.status_code == 200:
+                print(r.text)
+            else:
+                print(r.status_code)
 
 class log_file:
     def __init__(self, log_location="logs/whitebread.log"):
