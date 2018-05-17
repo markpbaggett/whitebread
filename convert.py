@@ -16,12 +16,12 @@ class Image:
     def pdf_to_thumb(self, extension=".png"):
         output = self.name.split('.', maxsplit=1)[0]
         print(f"Converting {self.name} to {output}{extension}.")
-        call(f"convert -thumbnail x250 -alpha remove '{self.name}[0]' {output}.jpg", shell=True)
+        call(f"convert -thumbnail x250 -alpha remove '{self.name}[0]' {output}_TN.jpg", shell=True)
 
     def preview_to_thumb(self, extension=".png"):
         output = self.name.split('.', maxsplit=1)[0]
         print(f"Converting {self.name} to {output}{extension}.")
-        call(f"convert -thumbnail x600 -alpha remove '{self.name}[0]' {output}.jpg", shell=True)
+        call(f"convert -thumbnail x600 -alpha remove '{self.name}[0]' {output}_PREVIEW.jpg", shell=True)
 
 
 def main():
