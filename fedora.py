@@ -149,7 +149,7 @@ class Set:
             print(f"Finding dsids for {result}.\n")
             url = f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/datastreams?profiles=true"
             print(url)
-            r = requests.get(url, auth=(f"{self.settings['username']}", f"{self.settings['password']}"))
+            r = requests.get(url, auth=(self.settings["gsearch_username"], self.settings["gsearch_password"]))
             if r.status_code == 200:
                 print(r.text)
             else:
