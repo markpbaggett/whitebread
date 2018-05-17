@@ -147,8 +147,9 @@ class Set:
     def list_dsids(self):
         for result in self.results:
             print(f"Finding dsids for {result}.\n")
-            r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}"
-                             f"/datastreams?profiles=true", auth=(f"{self.settings['username']}", f"{self.settings['password']}"))
+            url = f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/datastreams?profiles=true"
+            print(url)
+            r = requests.get(url, auth=(f"{self.settings['username']}", f"{self.settings['password']}"))
             if r.status_code == 200:
                 print(r.text)
             else:
