@@ -175,6 +175,7 @@ def get_extension(dsid):
         "JPG": ".jpg",
         "MODS": ".xml",
         "DC": ".xml",
-        "TRANSCRIPT": ".txt"
+        "TRANSCRIPT": ".txt",
+        "PREVIEW": ".jpg"
     }
     return datastream_extensions[dsid]
