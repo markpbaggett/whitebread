@@ -2,7 +2,7 @@ import yaml
 import argparse
 from fedora import Set
 
-def choose_operation(choice, instance, ds=None, predicate=None):
+def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
     if choice == "grab_images":
         instance.grab_images(ds)
     elif choice == "update_gsearch":
@@ -21,6 +21,11 @@ def choose_operation(choice, instance, ds=None, predicate=None):
     elif choice == "find_matching_relationship":
         memberships = instance.find_rels_ext_relationship(predicate)
         print(memberships)
+    elif choice == "update_labels":
+        if xpath is not None:
+            instance.update_fgs_label(xpath)
+        else:
+            print("Must specify xpath value.")
     elif choice == "harvest_metadata_no_pages":
         memberships = instance.find_rels_ext_relationship("isMemberOf")
         for pid in memberships:
@@ -63,9 +68,10 @@ def main():
     parser.add_argument("-ds", "--dsid", dest="datastream_id", help="specify text datastream.")
     parser.add_argument("-o", "--operation", dest="operation", help="Choose one: grab_images, harvest_metadata, "
                                                                     "grab_other, update_gsearch, find_missing, "
-                                                                    "get_relationships, find_bad_books, "
+                                                                    "get_relationships, find_bad_books, update_labels,"
                                                                     "harvest_metadata_no_pages",required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
+    parser.add_argument("-xp", "--xpath", dest="xpath", help="Specify an xpath value to find. Used in update_label.")
     args = parser.parse_args()
 
     settings = yaml.load(open("config.yml", "r"))
@@ -87,10 +93,14 @@ def main():
     dsid = None
     if args.datastream_id:
         dsid = args.datastream_id
+    my_xpath = None
+    if args.xpath:
+        my_xpath = args.xpath
     my_request = f"{fedora_url}:8080/fedora/objects?query={fedora_collection}{dc_parameter}" \
                  f"&pid=true&resultFormat=xml".replace(" ", "%20")
     my_records = Set(my_request, settings)
     my_records.populate()
-    choose_operation(operation, my_records, dsid, relationship)
+    choose_operation(operation, my_records, dsid, relationship, my_xpath)
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

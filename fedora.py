@@ -122,7 +122,7 @@ class Set:
         for i in self.results:
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
                              f"objects/{i}/relationships", auth=(f"{self.settings['username']}",
-                                                                      f"{self.settings['password']}"))
+                                                                 f"{self.settings['password']}"))
             if r.status_code == 200:
                 print(r.text)
 
@@ -147,13 +147,32 @@ class Set:
     def list_dsids(self):
         for result in self.results:
             print(f"Finding dsids for {result}.\n")
-            url = f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/datastreams?profiles=true"
+            url = f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/" \
+                  f"datastreams?profiles=true"
             print(url)
             r = requests.get(url, auth=(self.settings["gsearch_username"], self.settings["gsearch_password"]))
             if r.status_code == 200:
                 print(r.text)
             else:
                 print(r.status_code)
+
+    def update_fgs_label(self, xpath=""):
+        for result in self.results:
+            mods_path = f"{self.settings['islandora_path']}/islandora/object/{result}/datastream/MODS/"
+            document = etree.parse(mods_path)
+            label_path = document.xpath(xpath, namespaces={"mods": "http://www.loc.gov/mods/v3"})
+            if len(label_path) > 0:
+                print(f"Changing fgslabel for {result} to {label_path[0].text}.")
+                r = requests.put(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}?"
+                                 f"label={label_path[0].text}",
+                                 auth=(self.settings['username'], self.settings['password']))
+                if r.status_code == 200:
+                    print(f"\tSuccessfully updated {result}")
+                else:
+                    print(f"Failed to update with {r.status_code}.")
+            else:
+                print(f"Could not update.  Xpath did not match text for {result}.")
+
 
 class log_file:
     def __init__(self, log_location="logs/whitebread.log"):

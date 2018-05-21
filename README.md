@@ -45,3 +45,11 @@ Simple python scripts for those everyday, mundane Fedora tasks.
 ```
 >>> python run.py -o update_gsearch -p smhc
 ```
+
+## Update fgsLabel!
+
+**Like above, but drop in an xpath value to match on. Only works with mods right now."
+
+```
+>>> python run.py -o update_labels -p swim -xp "//mods:titleInfo[@supplied='yes']/mods:title"
+```
