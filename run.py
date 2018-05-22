@@ -2,6 +2,7 @@ import yaml
 import argparse
 from fedora import Set, Record
 
+
 def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
     if choice == "grab_images":
         instance.grab_images(ds)
@@ -62,6 +63,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
     else:
         print("No valid operator.")
 
+
 def review_memberships(item, membership_list, rel):
     for i in membership_list:
         if i["pid"] == item:
@@ -77,7 +79,7 @@ def main():
     parser.add_argument("-o", "--operation", dest="operation", help="Choose one: grab_images, harvest_metadata, "
                                                                     "grab_other, update_gsearch, find_missing, "
                                                                     "get_relationships, find_bad_books, update_labels,"
-                                                                    "harvest_metadata_no_pages",required=True)
+                                                                    "harvest_metadata_no_pages", required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
     parser.add_argument("-xp", "--xpath", dest="xpath", help="Specify an xpath value to find. Used in update_label.")
     args = parser.parse_args()
@@ -109,6 +111,7 @@ def main():
     my_records = Set(my_request, settings)
     my_records.populate()
     choose_operation(operation, my_records, dsid, relationship, my_xpath)
+
 
 if __name__ == "__main__":
     main()

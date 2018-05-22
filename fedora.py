@@ -160,18 +160,6 @@ class Set:
                 print(r.status_code)
 
 
-class log_file:
-    def __init__(self, log_location="logs/whitebread.log"):
-        self.location = log_location
-
-    def append(self, message):
-        try:
-            with open(self.location, "a") as file:
-                file.write(message)
-        except:
-            print(f"Can't write to {self.location}.")
-
-
 class Record:
     def __init__(self, pid):
         self.pid = pid
@@ -197,8 +185,8 @@ class Record:
             if len(label_path) > 0:
                 print(f"Changing fgslabel for {self.pid} to {label_path[0].text}.")
                 r = requests.put(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{self.pid}?"
-                                     f"label={label_path[0].text}",
-                                     auth=(self.settings['username'], self.settings['password']))
+                                 f"label={label_path[0].text}",
+                                 auth=(self.settings['username'], self.settings['password']))
                 if r.status_code == 200:
                     print(f"\tSuccessfully updated {self.pid}")
                 else:
@@ -217,8 +205,8 @@ class Record:
     def find_rels_ext_relationship(self, relationship):
         predicate = "&predicate=info:fedora/fedora-system:def/relations-external#" \
                     f"{relationship}".replace(":", "%3a").replace("/", "%2f").replace("#", "%23")
-        r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
-                         f"objects/{self.pid}/relationships?subject=info%3afedora%2f{self.pid}&format=turtle{predicate}",
+        r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/"
+                         f"{self.pid}/relationships?subject=info%3afedora%2f{self.pid}&format=turtle{predicate}",
                          auth=(f"{self.settings['username']}", f"{self.settings['password']}"))
         if r.status_code == 200:
             new_list = r.text.split(">")
@@ -234,6 +222,7 @@ class Record:
         document = etree.parse(mods_path)
         label_path = document.xpath(xpath, namespaces={"mods": "http://www.loc.gov/mods/v3"})
         return label_path[0].text
+
 
 def get_extension(dsid):
     datastream_extensions = {
