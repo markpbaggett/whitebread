@@ -2,8 +2,6 @@
 
 Simple python scripts for those everyday, mundane Fedora tasks.
 
-## Installing
-
 ## Harvest Metadata!
 
 **By Matching Parent Namespace:**
@@ -23,9 +21,15 @@ Simple python scripts for those everyday, mundane Fedora tasks.
 >>> python run.py -o harvest_metadata -p smhc -ds DC
 ```
 
+## Harvest Metadata but Ignore Records for Pages
+
+```
+>>> python run.py -o harvest_metadata_no_pages -p smhc -ds MODS
+```
+
 ## Grab Images
 
-** Like above, but for image mime types **
+**Like above, but for image mime types**
 ```
 >>> python run.py -p smhc -o grab_images -ds JP2
 ```
@@ -48,7 +52,7 @@ Simple python scripts for those everyday, mundane Fedora tasks.
 
 ## Update fgsLabel!
 
-**Like above, but drop in an xpath value to match on. Only works with mods right now."
+**Like above, but drop in an xpath value to match on. Only works with mods right now."**
 
 ```
 >>> python run.py -o update_labels -p swim -xp "//mods:titleInfo[@supplied='yes']/mods:title"
