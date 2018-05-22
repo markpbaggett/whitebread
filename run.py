@@ -1,6 +1,6 @@
 import yaml
 import argparse
-from fedora import Set
+from fedora import Set, Record
 
 def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
     if choice == "grab_images":
@@ -23,7 +23,15 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
         print(memberships)
     elif choice == "update_labels":
         if xpath is not None:
-            instance.update_fgs_label(xpath)
+            for result in instance.results:
+                new_record = Record(result)
+                relationships = new_record.find_rels_ext_relationship("isMemberOf")
+                if relationships is not None:
+                    parent = Record(relationships["isMemberOf"])
+                    label = parent.get_parent_label(xpath)
+                    new_record.update_fgs_label(xpath, f"{label}:  page {relationships['page number']}")
+                else:
+                    new_record.update_fgs_label(xpath)
         else:
             print("Must specify xpath value.")
     elif choice == "harvest_metadata_no_pages":

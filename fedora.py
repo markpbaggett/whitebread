@@ -3,6 +3,7 @@ import requests
 import os
 from PIL import Image
 from io import BytesIO
+import yaml
 
 
 class Set:
@@ -138,10 +139,12 @@ class Set:
             if r.status_code == 200:
                 new_list = r.text.split(">")
                 if len(new_list) == 4:
+                    new_record = Record(i)
+                    page_number = new_record.find_islandora_relationship("isPageNumber")
                     new_item = {"pid": i,
-                                f"{relationship}": new_list[2].replace("<info:fedora/", "").replace(" ", "")}
+                                f"{relationship}": new_list[2].replace("<info:fedora/", "").replace(" ", ""),
+                                "page number": page_number}
                     membership_list.append(new_item)
-        print(membership_list)
         return membership_list
 
     def list_dsids(self):
@@ -156,23 +159,6 @@ class Set:
             else:
                 print(r.status_code)
 
-    def update_fgs_label(self, xpath=""):
-        for result in self.results:
-            mods_path = f"{self.settings['islandora_path']}/islandora/object/{result}/datastream/MODS/"
-            document = etree.parse(mods_path)
-            label_path = document.xpath(xpath, namespaces={"mods": "http://www.loc.gov/mods/v3"})
-            if len(label_path) > 0:
-                print(f"Changing fgslabel for {result} to {label_path[0].text}.")
-                r = requests.put(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}?"
-                                 f"label={label_path[0].text}",
-                                 auth=(self.settings['username'], self.settings['password']))
-                if r.status_code == 200:
-                    print(f"\tSuccessfully updated {result}")
-                else:
-                    print(f"Failed to update with {r.status_code}.")
-            else:
-                print(f"Could not update.  Xpath did not match text for {result}.")
-
 
 class log_file:
     def __init__(self, log_location="logs/whitebread.log"):
@@ -185,6 +171,69 @@ class log_file:
         except:
             print(f"Can't write to {self.location}.")
 
+
+class Record:
+    def __init__(self, pid):
+        self.pid = pid
+        self.settings = yaml.load(open("config.yml", "r"))
+
+    def find_islandora_relationship(self, relationship):
+        predicate = "&predicate=http://islandora.ca/ontology/relsext#" \
+                    f"{relationship}".replace(":", "%3a").replace("/", "%2f").replace("#", "%23")
+        r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/"
+                         f"{self.pid}/relationships?subject=info%3afedora%2f{self.pid}&format=turtle{predicate}",
+                         auth=(f"{self.settings['username']}", f"{self.settings['password']}"))
+        if r.status_code == 200:
+            new_list = r.text.split(' ')
+            if len(new_list) is 4:
+                page_number = new_list[2].replace('"', "")
+                return page_number
+
+    def update_fgs_label(self, xpath="", page=None):
+        if page is None:
+            mods_path = f"{self.settings['islandora_path']}/islandora/object/{self.pid}/datastream/MODS/"
+            document = etree.parse(mods_path)
+            label_path = document.xpath(xpath, namespaces={"mods": "http://www.loc.gov/mods/v3"})
+            if len(label_path) > 0:
+                print(f"Changing fgslabel for {self.pid} to {label_path[0].text}.")
+                r = requests.put(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{self.pid}?"
+                                     f"label={label_path[0].text}",
+                                     auth=(self.settings['username'], self.settings['password']))
+                if r.status_code == 200:
+                    print(f"\tSuccessfully updated {self.pid}")
+                else:
+                    print(f"Failed to update with {r.status_code}.")
+            else:
+                print(f"Could not update.  Xpath did not match text for {self.pid}.")
+        else:
+            r = requests.put(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{self.pid}?"
+                             f"label={page}",
+                             auth=(self.settings['username'], self.settings['password']))
+            if r.status_code == 200:
+                print(f"\tSuccessfully updated {self.pid} to {page}.")
+            else:
+                print(f"Failed to update with {r.status_code}.")
+
+    def find_rels_ext_relationship(self, relationship):
+        predicate = "&predicate=info:fedora/fedora-system:def/relations-external#" \
+                    f"{relationship}".replace(":", "%3a").replace("/", "%2f").replace("#", "%23")
+        r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
+                         f"objects/{self.pid}/relationships?subject=info%3afedora%2f{self.pid}&format=turtle{predicate}",
+                         auth=(f"{self.settings['username']}", f"{self.settings['password']}"))
+        if r.status_code == 200:
+            new_list = r.text.split(">")
+            if len(new_list) == 4:
+                page_number = self.find_islandora_relationship("isPageNumber")
+                new_item = {"pid": self.pid,
+                            f"{relationship}": new_list[2].replace("<info:fedora/", "").replace(" ", ""),
+                            "page number": page_number}
+                return new_item
+
+    def get_parent_label(self, xpath):
+        mods_path = f"{self.settings['islandora_path']}/islandora/object/{self.pid}/datastream/MODS/"
+        document = etree.parse(mods_path)
+        label_path = document.xpath(xpath, namespaces={"mods": "http://www.loc.gov/mods/v3"})
+        return label_path[0].text
 
 def get_extension(dsid):
     datastream_extensions = {
