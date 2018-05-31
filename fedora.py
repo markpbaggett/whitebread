@@ -165,6 +165,12 @@ class Record:
         self.pid = pid
         self.settings = yaml.load(open("config.yml", "r"))
 
+    def __repr__(self):
+        return f"Record representing PID {self.pid}."
+
+    def __str__(self):
+        return f"Record representing PID {self.pid}."
+
     def find_islandora_relationship(self, relationship):
         predicate = "&predicate=http://islandora.ca/ontology/relsext#" \
                     f"{relationship}".replace(":", "%3a").replace("/", "%2f").replace("#", "%23")
@@ -233,6 +239,7 @@ def get_extension(dsid):
         "MODS": ".xml",
         "DC": ".xml",
         "TRANSCRIPT": ".txt",
-        "PREVIEW": ".jpg"
+        "PREVIEW": ".jpg",
+        "RELS-EXT": ".txt"
     }
     return datastream_extensions[dsid]
