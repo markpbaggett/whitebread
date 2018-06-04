@@ -28,6 +28,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
                 new_record = Record(result)
                 relationships = new_record.find_rels_ext_relationship("isMemberOf")
                 if relationships is not None:
+                    print(f"Finding parent of page {result}.")
                     parent = Record(relationships["isMemberOf"])
                     label = parent.get_parent_label(xpath)
                     new_record.update_fgs_label(xpath, f"{label}:  page {relationships['page number']}")
@@ -87,7 +88,7 @@ def main():
     settings = yaml.load(open("config.yml", "r"))
 
     fedora_collection = dc_parameter = ""
-    relationship = None
+    relationship = dsid = my_xpath = None
     if args.relationship:
         relationship = args.relationship
     fedora_url = settings["fedora_path"]
@@ -100,18 +101,17 @@ def main():
         dc_parameter = f"{args.dc_field}%7E%27{args.dc_string}%27"
     elif args.dc_field or args.dc_string:
         print(f"Must include both a dc field and a dc string.")
-    dsid = None
     if args.datastream_id:
         dsid = args.datastream_id
-    my_xpath = None
     if args.xpath:
         my_xpath = args.xpath
     my_request = f"{fedora_url}:8080/fedora/objects?query={fedora_collection}{dc_parameter}" \
-                 f"&pid=true&resultFormat=xml".replace(" ", "%20")
+                 f"&pid=true&resultFormat=xml&maxResults={settings['max_results']}".replace(" ", "%20")
+    print(my_request)
     my_records = Set(my_request, settings)
-    my_records.populate()
+    while my_records.token is not None:
+        my_records.populate()
     choose_operation(operation, my_records, dsid, relationship, my_xpath)
-
 
 if __name__ == "__main__":
     main()

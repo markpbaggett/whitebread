@@ -8,3 +8,4 @@ port: "8080"
 destination_directory: "output"
 log_file:  "logs/whitebread.log"
 islandora_path: "http://localhost:8000"
+max_results: 100

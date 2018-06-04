@@ -12,6 +12,7 @@ class Set:
         self.results = []
         self.request = search_string
         self.settings = yaml_settings
+        self.token = ""
 
     def __repr__(self):
         return f"A set of records based on the following http request:\n\t{self.request}."
@@ -19,17 +20,18 @@ class Set:
     def __str__(self):
         return f"A set of records based on the following http request:\n\t{self.request}."
 
-    def populate(self, session_token=""):
-        document = etree.parse(f"{self.request}{session_token}")
+    def populate(self):
+        document = etree.parse(f"{self.request}{self.token}")
         token = document.xpath('//types:token', namespaces={"types": "http://www.fedora.info/definitions/1/0/types/"})
         results = document.findall('//{http://www.fedora.info/definitions/1/0/types/}pid')
         for result in results:
             self.results.append(result.text)
             self.size += 1
         if len(token) == 1:
-            self.populate(f"&sessionToken={token[0].text}")
+            self.token = f"&sessionToken={token[0].text}"
         else:
-            return f"Added {self.results} to cluster."
+            self.token = None
+        return
 
     def harvest_metadata(self, dsid=None):
         if dsid is None:
