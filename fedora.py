@@ -21,15 +21,13 @@ class Set:
 
     def populate(self, session_token=""):
         document = etree.parse(f"{self.request}{session_token}")
-        token = document.findall('//{http://www.fedora.info/definitions/1/0/types/}token')
+        token = document.xpath('//types:token', namespaces={"types": "http://www.fedora.info/definitions/1/0/types/"})
         results = document.findall('//{http://www.fedora.info/definitions/1/0/types/}pid')
         for result in results:
             self.results.append(result.text)
             self.size += 1
         if len(token) == 1:
-            token_value = document.findall('//{http://www.fedora.info/definitions/1/0/types/}token')[0].text
-            new_token = f"&sessionToken={token_value}"
-            self.populate(new_token)
+            self.populate(f"&sessionToken={token[0].text}")
         else:
             return f"Added {self.results} to cluster."
 
