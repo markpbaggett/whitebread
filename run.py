@@ -8,6 +8,8 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
         instance.grab_images(ds)
     elif choice == "update_gsearch":
         instance.update_gsearch()
+    elif choice == "grab_foxml":
+        instance.grab_foxml()
     elif choice == "harvest_metadata":
         instance.harvest_metadata(ds)
         print(f"\n\nDownloaded {len(instance.results)} {ds} records.")
@@ -80,7 +82,8 @@ def main():
     parser.add_argument("-o", "--operation", dest="operation", help="Choose one: grab_images, harvest_metadata, "
                                                                     "grab_other, update_gsearch, find_missing, "
                                                                     "get_relationships, find_bad_books, update_labels,"
-                                                                    "harvest_metadata_no_pages", required=True)
+                                                                    "harvest_metadata_no_pages, grab_foxml",
+                        required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
     parser.add_argument("-xp", "--xpath", dest="xpath", help="Specify an xpath value to find. Used in update_label.")
     args = parser.parse_args()

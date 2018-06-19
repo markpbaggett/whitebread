@@ -159,6 +159,13 @@ class Set:
             else:
                 print(r.status_code)
 
+    def grab_foxml(self):
+        for result in self.results:
+            new_record = Record(result)
+            foxml = new_record.grab_foxml()
+            with open(f"{self.settings['destination_directory']}/{result}.xml", "w") as new_file:
+                new_file.write(foxml)
+
 
 class Record:
     def __init__(self, pid):
@@ -228,6 +235,14 @@ class Record:
         document = etree.parse(mods_path)
         label_path = document.xpath(xpath, namespaces={"mods": "http://www.loc.gov/mods/v3"})
         return label_path[0].text
+
+    def grab_foxml(self, foxml_contents=None):
+        r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{self.pid}/export",
+                         auth=(f"{self.settings['username']}", f"{self.settings['password']}"))
+        if r.status_code == 200:
+            foxml_contents = r.text
+        return foxml_contents
+
 
 
 def get_extension(dsid):
