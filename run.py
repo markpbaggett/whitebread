@@ -69,7 +69,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
         with open(f"pids_to_delete.txt", "w") as my_bad_pids:
             for i in items_to_remove:
                 print(f"{total}. {i}")
-                my_bad_pids.write(i)
+                my_bad_pids.write(f"{i}\n")
                 total += 1
         print(f"\nThese are the book objects that have some bad pages:")
         book_total = 1
