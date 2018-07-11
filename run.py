@@ -66,9 +66,11 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
                     items_to_remove.append(i["pid"])
         print(f"Here is a list of objects that have parts missing a {ds}:")
         total = 1
-        for i in items_to_remove:
-            print(f"{total}. {i}")
-            total += 1
+        with open(f"pids_to_delete.txt", "w") as my_bad_pids:
+            for i in items_to_remove:
+                print(f"{total}. {i}")
+                my_bad_pids.write(i)
+                total += 1
         print(f"\nThese are the book objects that have some bad pages:")
         book_total = 1
         for i in book_objects_to_remove:
