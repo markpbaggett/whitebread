@@ -45,15 +45,21 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
         instance.harvest_metadata(ds)
         print(f"\n\nDownloaded {len(instance.results)} {ds} records.")
     elif choice == "find_bad_books":
+        # Set some variables
         if predicate is None:
             predicate = "isMemberOf"
-        all_memberships = instance.find_rels_ext_relationship(predicate)
-        objects_missing_dsid = instance.mark_as_missing(ds)
         items_to_remove = []
+        book_objects_to_remove = []
+        # Find all memberships for results matching query
+        all_memberships = instance.find_rels_ext_relationship(predicate)
+        # Find objects missing the datastream in question
+        objects_missing_dsid = instance.mark_as_missing(ds)
+        # Add objects missing the dsid in question if they aren't already queued for removal
         for i in objects_missing_dsid:
             x = review_memberships(i, all_memberships, predicate)
             if x not in items_to_remove and x is not None:
                 items_to_remove.append(x)
+                book_objects_to_remove.append(x)
         for i in all_memberships:
             for j in items_to_remove:
                 if i[predicate] == j and i["pid"] not in items_to_remove:
@@ -63,6 +69,11 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
         for i in items_to_remove:
             print(f"{total}. {i}")
             total += 1
+        print(f"\nThese are the book objects that have some bad pages:")
+        book_total = 1
+        for i in book_objects_to_remove:
+            print(f"{book_total}. {i}")
+            book_total += 1
     else:
         print("No valid operator.")
 
