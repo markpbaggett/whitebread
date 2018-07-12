@@ -33,6 +33,9 @@ class Set:
             self.token = None
         return
 
+    def count_objects(self):
+        return len(self.results)
+
     def harvest_metadata(self, dsid=None):
         if dsid is None:
             dsid = self.settings["default_dsid"]

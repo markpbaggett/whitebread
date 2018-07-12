@@ -76,6 +76,8 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
         for i in book_objects_to_remove:
             print(f"{book_total}. {i}")
             book_total += 1
+    elif choice == "count_objects":
+        print(instance.count_objects())
     else:
         print("No valid operator.")
 
@@ -94,8 +96,9 @@ def main():
     parser.add_argument("-ds", "--dsid", dest="datastream_id", help="specify text datastream.")
     parser.add_argument("-o", "--operation", dest="operation", help="Choose one: grab_images, harvest_metadata, "
                                                                     "grab_other, update_gsearch, find_missing, "
-                                                                    "get_relationships, find_bad_books, update_labels,"
-                                                                    "harvest_metadata_no_pages, grab_foxml",
+                                                                    "get_relationships, find_bad_books, update_labels, "
+                                                                    "harvest_metadata_no_pages, grab_foxml, "
+                                                                    "count_objects",
                         required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
     parser.add_argument("-xp", "--xpath", dest="xpath", help="Specify an xpath value to find. Used in update_label.")
