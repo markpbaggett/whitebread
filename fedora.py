@@ -25,7 +25,7 @@ class Set:
         document = etree.parse(f"{self.request}{self.token}")
         token = document.xpath('//types:token', namespaces={"types": "http://www.fedora.info/definitions/1/0/types/"})
         results = document.findall('//{http://www.fedora.info/definitions/1/0/types/}pid')
-        print(".", end=" ")
+        print(".", end="", flush=True)
         for result in results:
             self.results.append(result.text)
             self.size += 1
