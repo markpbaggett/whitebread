@@ -4,6 +4,7 @@ import os
 from PIL import Image
 from io import BytesIO
 import yaml
+from tqdm import tqdm
 
 
 class Set:
@@ -44,13 +45,12 @@ class Set:
         else:
             os.mkdir(self.settings["destination_directory"])
         ext = get_extension(dsid)
-        for result in self.results:
+        for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
                              auth=(f"settings['username']", f"settings['password']"))
             if r.status_code == 200:
                 new_name = result.replace(":", "_")
-                print(f"Downloading {dsid} for {result}.")
                 with open(f"{self.settings['destination_directory']}/{new_name}{ext}", "w") as new_file:
                     new_file.write(r.text)
             else:
@@ -64,11 +64,10 @@ class Set:
         if dsid is None:
             dsid = self.settings["default_dsid"]
         ext = get_extension(dsid)
-        for result in self.results:
+        for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
                              auth=(f"settings['username']", f"settings['password']"))
-            print(f"Downloading the {dsid} datastream for {result}.")
             in_file = Image.open(BytesIO(r.content))
             new_name = result.replace(":", "_")
             in_file.save(f"{self.settings['destination_directory']}/{new_name}{ext}")
@@ -81,12 +80,11 @@ class Set:
         if dsid is None:
             dsid = self.settings["default_dsid"]
         ext = get_extension(dsid)
-        for result in self.results:
+        for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
                              auth=(f"settings['username']", f"settings['password']"))
             if r.status_code == 200:
-                print(f"Downloading the {dsid} datastream for {result}.")
                 new_name = result.replace(":", "_")
                 with open(f"{self.settings['destination_directory']}/{new_name}{ext}", 'wb') as other:
                     other.write(r.content)
@@ -98,13 +96,12 @@ class Set:
 
     def update_gsearch(self):
         successes = 0
-        for result in self.results:
+        for result in tqdm(self.results):
             r = requests.post(f"{self.settings['fedora_path']}:{self.settings['port']}/fedoragsearch/rest?"
                               f"operation=updateIndex&action=fromPid&value={result}",
                               auth=(self.settings["gsearch_username"], self.settings["gsearch_password"]))
             if r.status_code == 200:
                 successes += 1
-                print(f"Successfully updated record for {result} with gSearch.")
             else:
                 print(f"Failed to update gsearch for {result} with {r.status_code} status code.")
         print(f"\nSuccessfully updated {successes} records.")
@@ -113,7 +110,7 @@ class Set:
     def mark_as_missing(self, dsid=None):
         print(f"Finding results that are missing a {dsid} datastream.")
         missing = []
-        for i in self.results:
+        for i in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
                              f"objects/{i}/datastreams/{dsid}", auth=(f"{self.settings['username']}",
                                                                       f"{self.settings['password']}"))
@@ -123,7 +120,7 @@ class Set:
         return missing
 
     def get_relationships(self):
-        for i in self.results:
+        for i in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
                              f"objects/{i}/relationships", auth=(f"{self.settings['username']}",
                                                                  f"{self.settings['password']}"))
@@ -133,7 +130,7 @@ class Set:
     def find_rels_ext_relationship(self, relationship):
         membership_list = []
         print(f"Finding {relationship} objects for items in result list.")
-        for i in self.results:
+        for i in tqdm(self.results):
             predicate = "&predicate=info:fedora/fedora-system:def/relations-external#" \
                         f"{relationship}".replace(":", "%3a").replace("/", "%2f").replace("#", "%23")
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
@@ -151,11 +148,10 @@ class Set:
         return membership_list
 
     def list_dsids(self):
-        for result in self.results:
+        for result in tqdm(self.results):
             print(f"Finding dsids for {result}.\n")
             url = f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/" \
                   f"datastreams?profiles=true"
-            print(url)
             r = requests.get(url, auth=(self.settings["gsearch_username"], self.settings["gsearch_password"]))
             if r.status_code == 200:
                 print(r.text)
