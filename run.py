@@ -128,8 +128,8 @@ def main():
                  f"&pid=true&resultFormat=xml&maxResults={settings['max_results']}".replace(" ", "%20")
     print(my_request)
     my_records = Set(my_request, settings)
+    print("Populating results set.")
     while my_records.token is not None:
-        print("Populating results set.")
         my_records.populate()
     choose_operation(operation, my_records, dsid, relationship, my_xpath)
 
