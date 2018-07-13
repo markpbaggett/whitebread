@@ -126,9 +126,8 @@ def main():
         my_xpath = args.xpath
     my_request = f"{fedora_url}:8080/fedora/objects?query={fedora_collection}{dc_parameter}" \
                  f"&pid=true&resultFormat=xml&maxResults={settings['max_results']}".replace(" ", "%20")
-    print(my_request)
     my_records = Set(my_request, settings)
-    print("Populating results set.", end="", flush=True)
+    print("\nPopulating results set.", end="", flush=True)
     while my_records.token is not None:
         my_records.populate()
     choose_operation(operation, my_records, dsid, relationship, my_xpath)
