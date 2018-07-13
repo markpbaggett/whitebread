@@ -129,6 +129,7 @@ def main():
     print(my_request)
     my_records = Set(my_request, settings)
     while my_records.token is not None:
+        print("Populating results set.")
         my_records.populate()
     choose_operation(operation, my_records, dsid, relationship, my_xpath)
 
