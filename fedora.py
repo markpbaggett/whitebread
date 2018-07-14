@@ -255,6 +255,7 @@ def get_extension(dsid):
         "DC": ".xml",
         "TRANSCRIPT": ".txt",
         "PREVIEW": ".jpg",
-        "RELS-EXT": ".txt"
+        "RELS-EXT": ".xml",
+        "RELS-INT": ".xml"
     }
     return datastream_extensions[dsid]
