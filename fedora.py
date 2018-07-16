@@ -166,6 +166,11 @@ class Set:
             with open(f"{self.settings['destination_directory']}/{result}.xml", "w") as new_file:
                 new_file.write(foxml)
 
+    def test_embargos(self):
+        for result in self.results:
+            new_record = Record(result)
+            new_record.am_i_embargoed()
+
 
 class Record:
     def __init__(self, pid):
@@ -242,6 +247,16 @@ class Record:
         if r.status_code == 200:
             foxml_contents = r.text
         return foxml_contents
+
+    def am_i_embargoed(self):
+        r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{self.pid}/"
+                         f"datastreams/RELS-INT", auth=(self.settings['username'], self.settings['password']))
+        if r.status_code != 404:
+            print(f"{self.pid}:  {r.status_code}")
+        else:
+            pass
+
+
 
 
 

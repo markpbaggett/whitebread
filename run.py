@@ -78,6 +78,8 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
             book_total += 1
     elif choice == "count_objects":
         print(instance.count_objects())
+    elif choice == "test_embargos":
+        instance.test_embargos()
     else:
         print("No valid operator.")
 
