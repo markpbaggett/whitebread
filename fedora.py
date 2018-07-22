@@ -171,6 +171,19 @@ class Set:
             new_record = Record(result)
             new_record.am_i_embargoed()
 
+    def check_obj_mime_types(self):
+        mime_types = {}
+        for result in tqdm(self.results):
+            new_record = Record(result)
+            x = new_record.get_mime_type_of_object()
+            if x is None:
+                pass
+            elif x not in mime_types:
+                mime_types[x] = 1
+            else:
+                mime_types[x] += 1
+        return mime_types
+
 
 class Record:
     def __init__(self, pid):
@@ -256,8 +269,13 @@ class Record:
         else:
             pass
 
-
-
+    def get_mime_type_of_object(self):
+        r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{self.pid}/"
+                         f"datastreams/OBJ/content", auth=(self.settings['username'], self.settings['password']))
+        if r.status_code == 200:
+            return r.headers['content-type']
+        else:
+            return None
 
 
 def get_extension(dsid):

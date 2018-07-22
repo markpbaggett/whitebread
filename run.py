@@ -21,6 +21,11 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
         instance.get_relationships()
     elif choice == "grab_other":
         instance.grab_other(ds)
+    elif choice == "test_obj_mimes":
+        x = instance.check_obj_mime_types()
+        print("\nHere are the unique mime types in your result set:")
+        for k,v in x.items():
+            print(f"\tThere are {v} OBJs that are {k}.")
     elif choice == "find_matching_relationship":
         memberships = instance.find_rels_ext_relationship(predicate)
         print(memberships)
@@ -133,6 +138,7 @@ def main():
     while my_records.token is not None:
         my_records.populate()
     choose_operation(operation, my_records, dsid, relationship, my_xpath)
+
 
 if __name__ == "__main__":
     main()
