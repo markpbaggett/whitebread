@@ -97,14 +97,17 @@ class Set:
 
     def update_gsearch(self):
         successes = 0
-        for result in tqdm(self.results):
-            r = requests.post(f"{self.settings['fedora_path']}:{self.settings['port']}/fedoragsearch/rest?"
-                              f"operation=updateIndex&action=fromPid&value={result}",
-                              auth=(self.settings["gsearch_username"], self.settings["gsearch_password"]))
-            if r.status_code == 200:
-                successes += 1
-            else:
-                print(f"Failed to update gsearch for {result} with {r.status_code} status code.")
+        print("Updating gsearch ...\n")
+        with open("gsearch_log.txt", "w") as my_log:
+            for result in tqdm(self.results):
+                r = requests.post(f"{self.settings['fedora_path']}:{self.settings['port']}/fedoragsearch/rest?"
+                                  f"operation=updateIndex&action=fromPid&value={result}",
+                                  auth=(self.settings["gsearch_username"], self.settings["gsearch_password"]))
+                if r.status_code == 200:
+                    successes += 1
+                    my_log.write(f"Successfully updated Solr document for {result}.\n")
+                else:
+                    my_log.write(f"Failed to update Solr document for {result} with {r.status_code}.\n")
         print(f"\nSuccessfully updated {successes} records.")
         return
 
