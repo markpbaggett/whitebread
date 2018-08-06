@@ -28,7 +28,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
     elif choice == "test_obj_mimes":
         x = instance.check_obj_mime_types()
         print("\nHere are the unique mime types in your result set:")
-        for k,v in x.items():
+        for k, v in x.items():
             print(f"\tThere are {v} OBJs that are {k}.")
     elif choice == "find_matching_relationship":
         memberships = instance.find_rels_ext_relationship(predicate)
