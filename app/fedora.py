@@ -56,6 +56,7 @@ class Set:
                     new_file.write(r.text)
             else:
                 print(f"Could not harvest metadata for {result}: {r.status_code}.")
+        print(f"\n\nDownloaded {len(self.results)} {dsid} records.")
 
     def grab_images(self, dsid=None):
         if self.settings["destination_directory"] in os.listdir("."):

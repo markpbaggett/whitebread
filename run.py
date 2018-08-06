@@ -17,7 +17,6 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
         instance.grab_foxml()
     elif choice == "harvest_metadata":
         instance.harvest_metadata(ds)
-        print(f"\n\nDownloaded {len(instance.results)} {ds} records.")
     elif choice == "find_missing":
         instance.mark_as_missing(ds)
     elif choice == "list_dsids":
@@ -53,7 +52,6 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
         for pid in memberships:
             instance.results.remove(pid["pid"])
         instance.harvest_metadata(ds)
-        print(f"\n\nDownloaded {len(instance.results)} {ds} records.")
     elif choice == "find_bad_books":
         # Set some variables
         if predicate is None:
