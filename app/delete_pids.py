@@ -1,7 +1,7 @@
 import requests
 import yaml
 
-settings = yaml.load(open("config.yml", "r"))
+settings = yaml.load(open("../config.yml", "r"))
 
 
 def purge_object(pid):
@@ -12,6 +12,6 @@ def purge_object(pid):
     else:
         print(f"Could not purge {pid}. Status code: {r.status_code}.")
 
-with open("delete.txt", "r") as list_of_pids:
+with open("../delete.txt", "r") as list_of_pids:
     for current_pid in list_of_pids:
         purge_object(current_pid.replace("\n", ""))

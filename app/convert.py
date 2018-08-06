@@ -29,7 +29,7 @@ def main():
     parser.add_argument("-o", "--operation", dest="operation", help="Choose one: pdf_preview, pdf_thumb, thumb",
                         default="thumb")
     args = parser.parse_args()
-    settings = yaml.load(open("config.yml", "r"))
+    settings = yaml.load(open("../config.yml", "r"))
     for path in os.walk(settings["destination_directory"]):
         for file in path[2]:
             img = Image(f"{settings['destination_directory']}/{file}")

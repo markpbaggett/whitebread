@@ -191,7 +191,7 @@ class Set:
 class Record:
     def __init__(self, pid):
         self.pid = pid
-        self.settings = yaml.load(open("config.yml", "r"))
+        self.settings = yaml.load(open("../config.yml", "r"))
 
     def __repr__(self):
         return f"Record representing PID {self.pid}."

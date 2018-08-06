@@ -1,6 +1,6 @@
 import yaml
 import argparse
-from fedora import Set, Record
+from app.fedora import Set, Record
 
 
 def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
