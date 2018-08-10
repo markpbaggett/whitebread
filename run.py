@@ -85,7 +85,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
             print(f"{book_total}. {i}")
             book_total += 1
     elif choice == "count_objects":
-        print(instance.count_objects())
+        print(f"\n\nTotal matching documents: {instance.count_objects()}")
     elif choice == "test_embargos":
         instance.test_embargos()
     elif choice == "purge_old_dsids":
