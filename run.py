@@ -88,6 +88,11 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
         print(instance.count_objects())
     elif choice == "test_embargos":
         instance.test_embargos()
+    elif choice == "purge_old_dsids":
+        if ds is not None:
+            instance.purge_all_but_newest_dsid(ds)
+        else:
+            print("\n\nYou need to define a datastream to purge.")
     else:
         print("No valid operator.")
 
@@ -108,7 +113,8 @@ def main():
                                                                     "grab_other, update_gsearch, find_missing, "
                                                                     "get_relationships, find_bad_books, update_labels, "
                                                                     "harvest_metadata_no_pages, grab_foxml, "
-                                                                    "count_objects",
+                                                                    "count_objects, update_gsearch_no_pages, "
+                                                                    "purge_old_dsids",
                         required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
     parser.add_argument("-xp", "--xpath", dest="xpath", help="Specify an xpath value to find. Used in update_label.")

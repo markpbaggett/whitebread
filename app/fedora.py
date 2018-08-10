@@ -5,7 +5,9 @@ from PIL import Image
 from io import BytesIO
 import yaml
 from tqdm import tqdm
-
+import collections
+import xmltodict
+from bs4 import BeautifulSoup
 
 class Set:
     def __init__(self, search_string, yaml_settings):
@@ -79,7 +81,7 @@ class Set:
             pass
         else:
             os.mkdir(self.settings["destination_directory"])
-        if dsid is None:
+        if dsid is not None:
             dsid = self.settings["default_dsid"]
         ext = get_extension(dsid)
         for result in tqdm(self.results):
@@ -98,15 +100,23 @@ class Set:
 
     def update_gsearch(self):
         successes = 0
-        print("Updating gsearch ...\n")
+        print("\n\nUpdating gsearch\n")
         with open("gsearch_log.txt", "w") as my_log:
             for result in tqdm(self.results):
                 r = requests.post(f"{self.settings['fedora_path']}:{self.settings['port']}/fedoragsearch/rest?"
                                   f"operation=updateIndex&action=fromPid&value={result}",
                                   auth=(self.settings["gsearch_username"], self.settings["gsearch_password"]))
                 if r.status_code == 200:
-                    successes += 1
-                    my_log.write(f"Successfully updated Solr document for {result}.\n")
+                    soup = BeautifulSoup(r.text, features="lxml")
+                    success = False
+                    for tag in soup.find_all("td"):
+                        if tag.contents[0] == "Updated number of index documents: 1":
+                            success = True
+                    if success is True:
+                        successes += 1
+                        my_log.write(f"Successfully updated Solr document for {result}.\n")
+                    else:
+                        my_log.write(f"Failed to update Solr document for {result}.\n")
                 else:
                     my_log.write(f"Failed to update Solr document for {result} with {r.status_code}.\n")
         print(f"\nSuccessfully updated {successes} records.")
@@ -187,6 +197,21 @@ class Set:
             else:
                 mime_types[x] += 1
         return mime_types
+
+    def purge_all_but_newest_dsid(self, datastream):
+        user_input = input(f"\n\nAre you sure you want to delete all but the newest {datastream} for each object in the "
+                           f"collection? [y/N] ")
+        if user_input == "y":
+            with open(self.settings["log_file"], "w") as log_file:
+                for result in tqdm(self.results):
+                    new_record = Record(result)
+                    dates = new_record.determine_old_dsid_versions(datastream)
+                    if type(dates) is dict:
+                        response = new_record.purge_old_dsid_versions(datastream, dates["start"], dates["end"])
+                        log_file.write(response)
+        else:
+            print("\nExiting...")
+            return
 
 
 class Record:
@@ -280,6 +305,42 @@ class Record:
             return r.headers['content-type']
         else:
             return None
+
+    def determine_old_dsid_versions(self, dsid):
+        r = requests.get(f"{self.settings['fedora_path']}:8080/fedora/objects/{self.pid}/datastreams/{dsid}/history?"
+                         f"format=xml", auth=(self.settings['username'], self.settings['password']))
+        if r.status_code == 200:
+            response_text = xmltodict.parse(r.text)
+            versions = []
+            if type(response_text['datastreamHistory']['datastreamProfile']) == collections.OrderedDict:
+                return "Don't Delete"
+            else:
+                for version in response_text['datastreamHistory']['datastreamProfile']:
+                    versions.append(version["dsCreateDate"])
+                versions.sort(reverse=True)
+                if len(versions) >= 2:
+                    return {"start": versions[-1], "end": versions[1]}
+                else:
+                    return "Only 1 version"
+
+    def purge_old_dsid_versions(self, dsid, start=None, end=None):
+        other_parameters = ""
+        log_message = f"Purging {dsid} on {self.pid}"
+        if start is not None:
+            other_parameters += f"&startDT={start}"
+            log_message += f" from {start}"
+        if end is not None:
+            other_parameters += f"&endDT={end}"
+            log_message += f" until {end}"
+        temp_request = f"{self.settings['fedora_path']}:8080/fedora/objects/{self.pid}/datastreams/{dsid}?" \
+                       f"{other_parameters}{log_message}"
+        r = requests.delete(f"{self.settings['fedora_path']}:8080/fedora/objects/{self.pid}/datastreams/{dsid}?"
+                            f"{other_parameters}&logMessage={log_message}", auth=(self.settings['username'],
+                                                                                  self.settings['password']))
+        if r.status_code == 200:
+            return log_message
+        else:
+            return f"Failed to purge {dsid} on {self.pid} with {r.status_code}.\n\n{temp_request}"
 
 
 def get_extension(dsid):
