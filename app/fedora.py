@@ -90,6 +90,7 @@ class Set:
                              auth=(f"settings['username']", f"settings['password']"))
             if r.status_code == 200:
                 new_name = result.replace(":", "_")
+                print(r.headers["Content-Type"].split(";")[0])
                 with open(f"{self.settings['destination_directory']}/{new_name}{ext}", 'wb') as other:
                     other.write(r.content)
             else:
