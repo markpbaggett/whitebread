@@ -81,7 +81,7 @@ class Set:
             pass
         else:
             os.mkdir(self.settings["destination_directory"])
-        if dsid is not None:
+        if dsid is None:
             dsid = self.settings["default_dsid"]
         ext = get_extension(dsid)
         for result in tqdm(self.results):
