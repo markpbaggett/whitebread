@@ -47,13 +47,13 @@ class Set:
             pass
         else:
             os.mkdir(self.settings["destination_directory"])
-        ext = get_extension(dsid)
         for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
                              auth=(f"settings['username']", f"settings['password']"))
             if r.status_code == 200:
                 new_name = result.replace(":", "_")
+                ext = r.headers["Content-Type"].split(";")[0].split("/")[1]
                 with open(f"{self.settings['destination_directory']}/{new_name}{ext}", "w") as new_file:
                     new_file.write(r.text)
             else:
@@ -67,11 +67,11 @@ class Set:
             os.mkdir(self.settings["destination_directory"])
         if dsid is None:
             dsid = self.settings["default_dsid"]
-        ext = get_extension(dsid)
         for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
                              auth=(f"settings['username']", f"settings['password']"))
+            ext = r.headers["Content-Type"].split(";")[0].split("/")[1]
             in_file = Image.open(BytesIO(r.content))
             new_name = result.replace(":", "_")
             in_file.save(f"{self.settings['destination_directory']}/{new_name}{ext}")
@@ -83,14 +83,13 @@ class Set:
             os.mkdir(self.settings["destination_directory"])
         if dsid is None:
             dsid = self.settings["default_dsid"]
-        ext = get_extension(dsid)
         for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
                              auth=(f"settings['username']", f"settings['password']"))
             if r.status_code == 200:
                 new_name = result.replace(":", "_")
-                print(r.headers["Content-Type"].split(";")[0])
+                ext = r.headers["Content-Type"].split(";")[0].split("/")[1]
                 with open(f"{self.settings['destination_directory']}/{new_name}{ext}", 'wb') as other:
                     other.write(r.content)
             else:
@@ -343,19 +342,3 @@ class Record:
         else:
             return f"Failed to purge {dsid} on {self.pid} with {r.status_code}.\n\n{temp_request}"
 
-
-def get_extension(dsid):
-    datastream_extensions = {
-        "TN": ".jpg",
-        "OBJ": ".tif",
-        "JP2": ".jp2",
-        "JPG": ".jpg",
-        "MODS": ".xml",
-        "DC": ".xml",
-        "TRANSCRIPT": ".txt",
-        "PREVIEW": ".jpg",
-        "RELS-EXT": ".xml",
-        "PDF": ".pdf",
-        "RELS-INT": ".xml"
-    }
-    return datastream_extensions[dsid]
