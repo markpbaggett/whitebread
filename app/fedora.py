@@ -54,7 +54,7 @@ class Set:
             if r.status_code == 200:
                 new_name = result.replace(":", "_")
                 ext = r.headers["Content-Type"].split(";")[0].split("/")[1]
-                with open(f"{self.settings['destination_directory']}/{new_name}{ext}", "w") as new_file:
+                with open(f"{self.settings['destination_directory']}/{new_name}.{ext}", "w") as new_file:
                     new_file.write(r.text)
             else:
                 print(f"Could not harvest metadata for {result}: {r.status_code}.")
@@ -74,7 +74,7 @@ class Set:
             ext = r.headers["Content-Type"].split(";")[0].split("/")[1]
             in_file = Image.open(BytesIO(r.content))
             new_name = result.replace(":", "_")
-            in_file.save(f"{self.settings['destination_directory']}/{new_name}{ext}")
+            in_file.save(f"{self.settings['destination_directory']}/{new_name}.{ext}")
 
     def grab_other(self, dsid=None):
         if self.settings["destination_directory"] in os.listdir("."):
@@ -90,7 +90,7 @@ class Set:
             if r.status_code == 200:
                 new_name = result.replace(":", "_")
                 ext = r.headers["Content-Type"].split(";")[0].split("/")[1]
-                with open(f"{self.settings['destination_directory']}/{new_name}{ext}", 'wb') as other:
+                with open(f"{self.settings['destination_directory']}/{new_name}.{ext}", 'wb') as other:
                     other.write(r.content)
             else:
                 print(f"Failed to download {dsid} for {result} with {r.status_code}.")
