@@ -25,6 +25,8 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
         instance.get_relationships()
     elif choice == "grab_other":
         instance.grab_other(ds)
+    elif choice == "write_results":
+        instance.write_results_to_file()
     elif choice == "test_obj_mimes":
         x = instance.check_obj_mime_types()
         print("\nHere are the unique mime types in your result set:")
@@ -114,7 +116,7 @@ def main():
                                                                     "get_relationships, find_bad_books, update_labels, "
                                                                     "harvest_metadata_no_pages, grab_foxml, "
                                                                     "count_objects, update_gsearch_no_pages, "
-                                                                    "purge_old_dsids",
+                                                                    "purge_old_dsids, write_results",
                         required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
     parser.add_argument("-xp", "--xpath", dest="xpath", help="Specify an xpath value to find. Used in update_label.")

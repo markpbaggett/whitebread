@@ -213,6 +213,13 @@ class Set:
             print("\nExiting...")
             return
 
+    def write_results_to_file(self):
+        with open("results.txt", 'w') as my_results:
+            print("\nWriting results to results.txt.\n")
+            for result in self.results:
+                my_results.write(result)
+            print("Done")
+
 
 class Record:
     def __init__(self, pid):
