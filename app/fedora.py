@@ -217,7 +217,7 @@ class Set:
         with open("results.txt", 'w') as my_results:
             print("\nWriting results to results.txt.\n")
             for result in self.results:
-                my_results.write(result)
+                my_results.write(f"{result}\n")
             print("Done")
 
 
