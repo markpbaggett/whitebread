@@ -175,13 +175,19 @@ class Set:
         return
 
     def check_if_dsid_exists(self, my_dsid):
+        has_the_dsid = []
         for result in tqdm(self.results):
-            url = f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/" \
-                  f"datastreams?profiles=true"
-            r = requests.get(url, auth=(self.settings["gsearch_username"], self.settings["gsearch_password"]))
-            if r.status_code == 200:
-                response_text = xmltodict.parse(r.text)
-                print(response_text)
+            new_result = Record(result)
+            exists = new_result.check_if_dsid_exists(my_dsid)
+            if exists == True:
+                has_the_dsid.append(result)
+        self.print_results(has_the_dsid)
+
+    @staticmethod
+    def print_results(results):
+        i = 1
+        for record in results:
+            print(f"{i}. record")
 
 
     def grab_foxml(self):
@@ -359,4 +365,18 @@ class Record:
             return log_message
         else:
             return f"Failed to purge {dsid} on {self.pid} with {r.status_code}.\n\n{temp_request}"
+
+    def check_if_dsid_exists(self, my_dsid):
+        url = f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{self.pid}/" \
+              f"datastreams?profiles=true"
+        r = requests.get(url, auth=(self.settings["gsearch_username"], self.settings["gsearch_password"]))
+        if r.status_code == 200:
+            response_text = xmltodict.parse(r.text)
+            exists = False
+            for dsid in response_text['objectDatastreams']['datastreamProfile']:
+                if dsid['@dsID'] == my_dsid:
+                    exists = True
+            return exists
+
+
 
