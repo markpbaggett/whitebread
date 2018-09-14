@@ -23,6 +23,8 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
         instance.list_dsids()
     elif choice == "check_if_dsid_exists":
         instance.check_if_dsid_exists(ds)
+    elif choice == "find_unique_dsids":
+        instance.compile_unique_dsids()
     elif choice == "get_relationships":
         instance.get_relationships()
     elif choice == "grab_other":
@@ -119,7 +121,7 @@ def main():
                                                                     "harvest_metadata_no_pages, grab_foxml, "
                                                                     "count_objects, update_gsearch_no_pages, "
                                                                     "purge_old_dsids, write_results, "
-                                                                    "check_if_dsid_exists",
+                                                                    "check_if_dsid_exists, find_unique_dsids",
                         required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
     parser.add_argument("-xp", "--xpath", dest="xpath", help="Specify an xpath value to find. Used in update_label.")

@@ -181,7 +181,7 @@ class Set:
             exists = new_result.check_if_dsid_exists(my_dsid)
             if exists == True:
                 has_the_dsid.append(result)
-        self.print_results(has_the_dsid)
+        return self.print_results(has_the_dsid)
 
     @staticmethod
     def print_results(results):
@@ -190,7 +190,6 @@ class Set:
             print(f"{i}. {record}")
             i += 1
         return
-
 
     def grab_foxml(self):
         for result in self.results:
@@ -238,6 +237,17 @@ class Set:
             for result in self.results:
                 my_results.write(f"{result}\n")
             print("Done")
+
+    def compile_unique_dsids(self):
+        uniques = []
+        for result in tqdm(self.results):
+            new_record = Record(result)
+            unique_dsids = new_record.find_unique_dsids()
+            for dsid in unique_dsids:
+                if dsid not in uniques:
+                    uniques.append(dsid)
+        self.print_results(uniques)
+        return
 
 
 class Record:
@@ -380,5 +390,13 @@ class Record:
                     exists = True
             return exists
 
+    def find_unique_dsids(self):
+        url = f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{self.pid}/" \
+              f"datastreams?profiles=true"
+        r = requests.get(url, auth=(self.settings["gsearch_username"], self.settings["gsearch_password"]))
+        if r.status_code == 200:
+            response_text = xmltodict.parse(r.text)
+            unique_dsids = [dsid for dsid in response_text['objectDatastreams']['datastreamProfile']]
+            return unique_dsids
 
 
