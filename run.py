@@ -21,6 +21,8 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
         instance.mark_as_missing(ds)
     elif choice == "list_dsids":
         instance.list_dsids()
+    elif choice == "check_if_dsid_exists":
+        instance.check_if_dsid_exists(ds)
     elif choice == "get_relationships":
         instance.get_relationships()
     elif choice == "grab_other":
@@ -116,7 +118,8 @@ def main():
                                                                     "get_relationships, find_bad_books, update_labels, "
                                                                     "harvest_metadata_no_pages, grab_foxml, "
                                                                     "count_objects, update_gsearch_no_pages, "
-                                                                    "purge_old_dsids, write_results",
+                                                                    "purge_old_dsids, write_results, "
+                                                                    "check_if_dsid_exists",
                         required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
     parser.add_argument("-xp", "--xpath", dest="xpath", help="Specify an xpath value to find. Used in update_label.")

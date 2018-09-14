@@ -172,6 +172,17 @@ class Set:
                 print(r.text)
             else:
                 print(r.status_code)
+        return
+
+    def check_if_dsid_exists(self, my_dsid):
+        for result in tqdm(self.results):
+            url = f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/" \
+                  f"datastreams?profiles=true"
+            r = requests.get(url, auth=(self.settings["gsearch_username"], self.settings["gsearch_password"]))
+            if r.status_code == 200:
+                response_text = xmltodict.parse(r.text)
+                print(response_text)
+
 
     def grab_foxml(self):
         for result in self.results:
