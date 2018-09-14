@@ -187,7 +187,9 @@ class Set:
     def print_results(results):
         i = 1
         for record in results:
-            print(f"{i}. record")
+            print(f"{i}. {record}")
+            i += 1
+        return
 
 
     def grab_foxml(self):
