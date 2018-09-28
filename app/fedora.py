@@ -51,6 +51,7 @@ class Set:
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
                              auth=(f"settings['username']", f"settings['password']"))
+            r.encoding = "utf-8"
             if r.status_code == 200:
                 new_name = result.replace(":", "_")
                 ext = r.headers["Content-Type"].split(";")[0].split("/")[1]
