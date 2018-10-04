@@ -61,6 +61,11 @@ class Set:
                 print(f"Could not harvest metadata for {result}: {r.status_code}.")
         print(f"\n\nDownloaded {len(self.results)} {dsid} records.")
 
+    def find_content_types(self):
+        for result in self.results:
+            x = Record(result).find_content_type()
+        return
+
     def grab_images(self, dsid=None):
         if self.settings["destination_directory"] in os.listdir("."):
             pass
@@ -349,4 +354,13 @@ class Record:
             return log_message
         else:
             return f"Failed to purge {dsid} on {self.pid} with {r.status_code}.\n\n{temp_request}"
+
+    def find_content_type(self, relationship):
+        predicate = "&predicate=info:fedora/fedora-system:def/relations-external#" \
+                    f"{relationship}".replace(":", "%3a").replace("/", "%2f").replace("#", "%23")
+        r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/"
+                         f"{self.pid}/relationships?subject=info%3afedora%2f{self.pid}&format=turtle{predicate}",
+                         auth=(f"{self.settings['username']}", f"{self.settings['password']}"))
+        print(r.text)
+        return
 
