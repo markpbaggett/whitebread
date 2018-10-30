@@ -7,7 +7,7 @@ name = "pypi"
 python_version = "3.6"
 
 [packages]
-requests = ">=2.18.4"
+requests = ">=2.20.0"
 lxml = ">=4.1"
 Pillow = ">=5.0"
 PyYAML = ">=3.1.2"
