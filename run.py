@@ -99,6 +99,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
             print("\n\nYou need to define a datastream to purge.")
     else:
         print("No valid operator.")
+    return
 
 
 def review_memberships(item, membership_list, rel):

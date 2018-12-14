@@ -60,6 +60,7 @@ class Set:
             else:
                 print(f"Could not harvest metadata for {result}: {r.status_code}.")
         print(f"\n\nDownloaded {len(self.results)} {dsid} records.")
+        return
 
     def find_content_types(self):
         content_types = []
@@ -68,6 +69,7 @@ class Set:
             if x not in content_types:
                 content_types.append(x)
         print(content_types)
+        return
 
     def grab_images(self, dsid=None):
         if self.settings["destination_directory"] in os.listdir("."):
@@ -84,6 +86,7 @@ class Set:
             in_file = Image.open(BytesIO(r.content))
             new_name = result.replace(":", "_")
             in_file.save(f"{self.settings['destination_directory']}/{new_name}.{ext}")
+        return
 
     def grab_other(self, dsid=None):
         if self.settings["destination_directory"] in os.listdir("."):
@@ -103,6 +106,7 @@ class Set:
                     other.write(r.content)
             else:
                 print(f"Failed to download {dsid} for {result} with {r.status_code}.")
+        return
 
     def size_of_set(self):
         return f"Total records: {len(self.results)}"
@@ -150,6 +154,7 @@ class Set:
                                                                  f"{self.settings['password']}"))
             if r.status_code == 200:
                 print(r.text)
+        return
 
     def find_rels_ext_relationship(self, relationship):
         membership_list = []
@@ -181,6 +186,7 @@ class Set:
                 print(r.text)
             else:
                 print(r.status_code)
+        return
 
     def grab_foxml(self):
         for result in self.results:
@@ -188,11 +194,13 @@ class Set:
             foxml = new_record.grab_foxml()
             with open(f"{self.settings['destination_directory']}/{result}.xml", "w") as new_file:
                 new_file.write(foxml)
+        return
 
     def test_embargos(self):
         for result in self.results:
             new_record = Record(result)
             new_record.am_i_embargoed()
+        return
 
     def check_obj_mime_types(self):
         mime_types = {}
@@ -218,6 +226,7 @@ class Set:
                     if type(dates) is dict:
                         response = new_record.purge_old_dsid_versions(datastream, dates["start"], dates["end"])
                         log_file.write(response)
+            return
         else:
             print("\nExiting...")
             return
@@ -228,6 +237,7 @@ class Set:
             for result in self.results:
                 my_results.write(f"{result}\n")
             print("Done")
+        return
 
 
 class Record:
@@ -252,6 +262,7 @@ class Record:
             if len(new_list) is 4:
                 page_number = new_list[2].replace('"', "")
                 return page_number
+        return
 
     def update_fgs_label(self, xpath="", page=None):
         if page is None:
@@ -277,6 +288,7 @@ class Record:
                 print(f"\tSuccessfully updated {self.pid} to {page}.")
             else:
                 print(f"Failed to update with {r.status_code}.")
+        return
 
     def find_rels_ext_relationship(self, relationship):
         predicate = "&predicate=info:fedora/fedora-system:def/relations-external#" \
@@ -292,6 +304,7 @@ class Record:
                             f"{relationship}": new_list[2].replace("<info:fedora/", "").replace(" ", ""),
                             "page number": page_number}
                 return new_item
+        return
 
     def get_parent_label(self, xpath):
         mods_path = f"{self.settings['islandora_path']}/islandora/object/{self.pid}/datastream/MODS/"
@@ -313,6 +326,7 @@ class Record:
             print(f"{self.pid}:  {r.status_code}")
         else:
             pass
+        return
 
     def get_mime_type_of_object(self):
         r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{self.pid}/"
