@@ -108,7 +108,8 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
                 parent = Record(relationships["isMemberOf"])
                 if parent.pid not in books:
                     books.append(parent.pid)
-                    book_list.append({"name": parent.pid,  "pages": 1})
+                    label = parent.get_parent_label("//mods:identifer[type='local'")
+                    book_list.append({"name": parent.pid,  "pages": 1, "admindb": label})
                 else:
                     for book in book_list:
                         if book["name"] == parent.pid:
