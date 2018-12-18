@@ -97,6 +97,23 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
             instance.purge_all_but_newest_dsid(ds)
         else:
             print("\n\nYou need to define a datastream to purge.")
+    elif choice == "find_pages_per_book":
+        books = []
+        book_list = []
+        for result in instance.results:
+            new_record = Record(result)
+            relationships = new_record.find_rels_ext_relationship("isMemberOf")
+            if relationships is not None:
+                print(f"Finding parent of page {result}.")
+                parent = Record(relationships["isMemberOf"])
+                if parent.pid not in books:
+                    books.append(parent.pid)
+                    book_list.append({"name": parent.pid,  "pages": 1})
+                else:
+                    for book in book_list:
+                        if book["name"] == parent.pid:
+                            book["pages"] += 1
+        print(book_list)
     else:
         print("No valid operator.")
     return
