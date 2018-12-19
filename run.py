@@ -109,7 +109,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
                 if parent.pid not in books:
                     books.append(parent.pid)
                     try:
-                        label = parent.get_parent_label("//mods:identifier[type='local']")
+                        label = parent.get_parent_label("//mods:identifier[@type='local']")
                     except IndexError:
                         label = "missing"
                     except OSError as e:
