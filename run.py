@@ -1,7 +1,7 @@
 import yaml
 import argparse
 from app.fedora import Set, Record
-
+from time import sleep
 
 def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
     if choice == "grab_images":
@@ -112,9 +112,15 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
                         label = parent.get_parent_label("//mods:identifier[@type='local']")
                     except IndexError:
                         label = "missing"
-                    except OSError as e:
-                        label = e
-                    book_list.append({"name": parent.pid,  "pages": 1, "admindb": label})
+                    except OSError:
+                        label = "Access Denied"
+                    try:
+                        extent = parent.get_parent_label("//mods:extent")
+                    except IndexError:
+                        label = "missing"
+                    except OSError:
+                        label = "Access Denied"
+                    book_list.append({"name": parent.pid,  "pages": 1, "admindb": label, "extent_pages": extent})
                 else:
                     for book in book_list:
                         if book["name"] == parent.pid:
@@ -129,6 +135,17 @@ def review_memberships(item, membership_list, rel):
     for i in membership_list:
         if i["pid"] == item:
             return i[rel]
+
+
+def add_a_book(a_parent):
+    try:
+        label = a_parent.get_parent_label("//mods:identifier[@type='local']")
+    except IndexError:
+        label = "missing"
+    except OSError:
+        sleep(3)
+
+    return {"name": a_parent.pid, "pages": 1, "admindb": label}
 
 
 def main():
