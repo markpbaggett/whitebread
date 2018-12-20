@@ -308,8 +308,8 @@ class Record:
 
     def get_parent_label(self, xpath):
         mods = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{self.pid}/" \
-                    f"datastreams/MODS?format=XML", auth=(self.settings['username'], self.settings['password'])).content
-        document = etree.parse(mods)
+                    f"datastreams/MODS?format=XML", auth=(self.settings['username'], self.settings['password']))
+        document = etree.fromstring(mods.content)
         label_path = document.xpath(xpath, namespaces={"mods": "http://www.loc.gov/mods/v3"})
         return label_path[0].text
 
