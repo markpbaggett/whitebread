@@ -307,7 +307,8 @@ class Record:
         return
 
     def get_parent_label(self, xpath):
-        mods_path = f"{self.settings['islandora_path']}/islandora/object/{self.pid}/datastream/MODS/"
+        mods_path = f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{self.pid}/" \
+                    f"datastreams/MODS?format=XML"
         document = etree.parse(mods_path)
         label_path = document.xpath(xpath, namespaces={"mods": "http://www.loc.gov/mods/v3"})
         return label_path[0].text
