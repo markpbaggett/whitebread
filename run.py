@@ -117,9 +117,9 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
                     try:
                         extent = parent.get_parent_label("//mods:extent")
                     except IndexError:
-                        label = "missing"
+                        extent = "missing"
                     except OSError:
-                        label = "Access Denied"
+                        extent = "Access Denied"
                     book_list.append({"name": parent.pid,  "pages": 1, "admindb": label, "extent_pages": extent})
                 else:
                     for book in book_list:
