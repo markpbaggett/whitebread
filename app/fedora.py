@@ -9,6 +9,7 @@ import collections
 import xmltodict
 from bs4 import BeautifulSoup
 
+
 class Set:
     def __init__(self, search_string, yaml_settings):
         self.size = 0
@@ -243,7 +244,7 @@ class Set:
 class Record:
     def __init__(self, pid):
         self.pid = pid
-        self.settings = yaml.load(open("config.yml", "r"))
+        self.settings = yaml.safe_load(open("config.yml", "r"))
 
     def __repr__(self):
         return f"Record representing PID {self.pid}."

@@ -1,7 +1,7 @@
 import requests
 import yaml
 
-settings = yaml.load(open("../config.yml", "r"))
+settings = yaml.safe_load(open("../config.yml", "r"))
 
 
 def purge_object(pid):

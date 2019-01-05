@@ -165,7 +165,7 @@ def main():
     parser.add_argument("-xp", "--xpath", dest="xpath", help="Specify an xpath value to find. Used in update_label.")
     args = parser.parse_args()
 
-    settings = yaml.load(open("config.yml", "r"))
+    settings = yaml.safe_load(open("config.yml", "r"))
 
     fedora_collection = dc_parameter = ""
     relationship = dsid = my_xpath = None
