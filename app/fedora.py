@@ -51,7 +51,7 @@ class Set:
         for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
-                             auth=(f"settings['username']", f"settings['password']"))
+                             auth=(self.settings['username'], self.settings['password']))
             r.encoding = "utf-8"
             if r.status_code == 200:
                 new_name = result.replace(":", "_")
@@ -82,7 +82,7 @@ class Set:
         for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
-                             auth=(f"settings['username']", f"settings['password']"))
+                             auth=(self.settings['username'], self.settings['password']))
             ext = r.headers["Content-Type"].split(";")[0].split("/")[1]
             in_file = Image.open(BytesIO(r.content))
             new_name = result.replace(":", "_")
@@ -99,7 +99,7 @@ class Set:
         for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
-                             auth=(f"settings['username']", f"settings['password']"))
+                             auth=(self.settings['username'], self.settings['password']))
             if r.status_code == 200:
                 new_name = result.replace(":", "_")
                 ext = r.headers["Content-Type"].split(";")[0].split("/")[1]
