@@ -4,7 +4,7 @@ from app.fedora import Set, Record
 from time import sleep
 
 
-def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
+def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_of_date=None):
     if choice == "grab_images":
         instance.grab_images(ds)
     elif choice == "update_gsearch":
@@ -32,6 +32,8 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
         instance.write_results_to_file()
     elif choice == "get_history":
         instance.get_datastream_history(ds)
+    elif choice == "get_datastream_at_date":
+        instance.get_datastream_at_date(ds, as_of_date)
     elif choice == "test_obj_mimes":
         x = instance.check_obj_mime_types()
         print("\nHere are the unique mime types in your result set:")
@@ -157,12 +159,14 @@ def main():
     parser.add_argument("-dc", "--dcfield", dest="dc_field", help="grab pids according to dc field")
     parser.add_argument("-dcs", "--dcstring", dest="dc_string", help="specify a dc string")
     parser.add_argument("-ds", "--dsid", dest="datastream_id", help="specify text datastream.")
+    parser.add_argument('-d', "--date", dest="as_of_date", help="if using get_datastream_at_date, specify a date")
     parser.add_argument("-o", "--operation", dest="operation", help="Choose one: grab_images, harvest_metadata, "
                                                                     "grab_other, update_gsearch, find_missing, "
                                                                     "get_relationships, find_bad_books, update_labels, "
                                                                     "harvest_metadata_no_pages, grab_foxml, "
                                                                     "count_objects, update_gsearch_no_pages, "
-                                                                    "purge_old_dsids, write_results, get_history",
+                                                                    "purge_old_dsids, write_results, get_history,"
+                                                                    "get_datastream_at_date",
                         required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
     parser.add_argument("-xp", "--xpath", dest="xpath", help="Specify an xpath value to find. Used in update_label.")
@@ -171,7 +175,7 @@ def main():
     settings = yaml.safe_load(open("config.yml", "r"))
 
     fedora_collection = dc_parameter = ""
-    relationship = dsid = my_xpath = None
+    relationship = dsid = my_xpath = my_date = None
     if args.relationship:
         relationship = args.relationship
     fedora_url = settings["fedora_path"]
@@ -188,13 +192,15 @@ def main():
         dsid = args.datastream_id
     if args.xpath:
         my_xpath = args.xpath
+    if args.as_of_date:
+        my_date = args.as_of_date
     my_request = f"{fedora_url}:8080/fedora/objects?query={fedora_collection}{dc_parameter}" \
                  f"&pid=true&resultFormat=xml&maxResults={settings['max_results']}".replace(" ", "%20")
     my_records = Set(my_request, settings)
     print("\nPopulating results set.", end="", flush=True)
     while my_records.token is not None:
         my_records.populate()
-    choose_operation(operation, my_records, dsid, relationship, my_xpath)
+    choose_operation(operation, my_records, dsid, relationship, my_xpath, my_date)
 
 
 if __name__ == "__main__":
