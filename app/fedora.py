@@ -109,6 +109,27 @@ class Set:
                 print(f"Failed to download {dsid} for {result} with {r.status_code}.")
         return
 
+    def get_datastream_history(self, dsid=None):
+        if self.settings["destination_directory"] in os.listdir("."):
+            pass
+        else:
+            os.mkdir(self.settings["destination_directory"])
+        if dsid is None:
+            dsid = self.settings["default_dsid"]
+        for result in tqdm(self.results):
+            r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
+                             f"datastreams/{dsid}/history",
+                             auth=(self.settings['username'], self.settings['password']))
+            if r.status_code == 200:
+                new_name = result.replace(":", "_")
+                ext = r.headers["Content-Type"].split(";")[0].split("/")[1]
+                with open(f"{self.settings['destination_directory']}/{new_name}.{ext}", "w") as new_file:
+                    new_file.write(r.text)
+            else:
+                print(f"Could not harvest metadata for {result}: {r.status_code}.")
+        return
+
+
     def size_of_set(self):
         return f"Total records: {len(self.results)}"
 

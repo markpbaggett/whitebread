@@ -3,6 +3,7 @@ import argparse
 from app.fedora import Set, Record
 from time import sleep
 
+
 def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
     if choice == "grab_images":
         instance.grab_images(ds)
@@ -29,6 +30,8 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None):
         instance.find_content_types()
     elif choice == "write_results":
         instance.write_results_to_file()
+    elif choice == "get_history":
+        instance.get_datastream_history(ds)
     elif choice == "test_obj_mimes":
         x = instance.check_obj_mime_types()
         print("\nHere are the unique mime types in your result set:")
@@ -159,7 +162,7 @@ def main():
                                                                     "get_relationships, find_bad_books, update_labels, "
                                                                     "harvest_metadata_no_pages, grab_foxml, "
                                                                     "count_objects, update_gsearch_no_pages, "
-                                                                    "purge_old_dsids, write_results",
+                                                                    "purge_old_dsids, write_results, get_history",
                         required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
     parser.add_argument("-xp", "--xpath", dest="xpath", help="Specify an xpath value to find. Used in update_label.")
