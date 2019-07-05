@@ -31,7 +31,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
     elif choice == "write_results":
         instance.write_results_to_file()
     elif choice == "get_history":
-        instance.get_datastream_history(ds)
+        instance.write_datastream_history(ds)
     elif choice == "get_datastream_at_date":
         instance.get_datastream_at_date(ds, as_of_date)
     elif choice == "test_obj_mimes":

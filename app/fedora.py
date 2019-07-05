@@ -109,7 +109,7 @@ class Set:
                 print(f"Failed to download {dsid} for {result} with {r.status_code}.")
         return
 
-    def get_datastream_history(self, dsid=None):
+    def write_datastream_history(self, dsid=None):
         if self.settings["destination_directory"] in os.listdir("."):
             pass
         else:
