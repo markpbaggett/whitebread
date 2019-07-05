@@ -8,7 +8,6 @@ from tqdm import tqdm
 import collections
 import xmltodict
 from bs4 import BeautifulSoup
-import json
 
 
 class Set:
@@ -162,7 +161,7 @@ class Set:
                              f"datastreams/{dsid}/history?format=xml",
                              auth=(self.settings['username'], self.settings['password']))
             if r.status_code == 200:
-                print(r.content)
+                print(xmltodict.parser(r.text))
 
     def size_of_set(self):
         return f"Total records: {len(self.results)}"
