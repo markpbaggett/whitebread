@@ -176,7 +176,7 @@ class Set:
                             other.write(current_version.content)
                     else:
                         print(f"Failed to download {dsid} for {result} with {current_version.status_code}.")
-            return
+        return
 
     def size_of_set(self):
         return f"Total records: {len(self.results)}"
