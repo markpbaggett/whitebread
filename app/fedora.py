@@ -8,6 +8,7 @@ from tqdm import tqdm
 import collections
 import xmltodict
 from bs4 import BeautifulSoup
+import json
 
 
 class Set:
@@ -161,7 +162,21 @@ class Set:
                              f"datastreams/{dsid}/history?format=xml",
                              auth=(self.settings['username'], self.settings['password']))
             if r.status_code == 200:
-                print(xmltodict.parse(r.text))
+                json_response = json.dumps(xmltodict.parse(r.text)['datastreamHistory'])
+                for version in json_response['datastreamProfile']:
+                    version_title = version['dsVersionID'].replace('.', '_')
+                    current_version = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
+                                                   f"objects/{result}/datastreams/{dsid}/content?asOfDateTime="
+                                                   f"{version['dsCreateDate']}",
+                                                   auth=(self.settings['username'], self.settings['password']))
+                    if current_version.status_code == 200:
+                        new_name = result.replace(":", "_")
+                        ext = r.headers["Content-Type"].split(";")[0].split("/")[1]
+                        with open(f"{self.settings['destination_directory']}/{new_name}{version_title}.{ext}", 'wb') as other:
+                            other.write(r.content)
+                    else:
+                        print(f"Failed to download {dsid} for {result} with {current_version.status_code}.")
+            return
 
     def size_of_set(self):
         return f"Total records: {len(self.results)}"
