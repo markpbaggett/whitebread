@@ -163,8 +163,9 @@ class Set:
                              auth=(self.settings['username'], self.settings['password']))
             if r.status_code == 200:
                 json_response = json.dumps(xmltodict.parse(r.text)['datastreamHistory'])
-                for version in json_response['datastreamProfile']:
-                    print(version)
+                print(json_response['datastreamProfile'])
+                # for version in json_response['datastreamProfile']:
+                #     print(version)
                     # version_title = version['dsVersionID'].replace('.', '_')
                     # current_version = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
                     #                                f"objects/{result}/datastreams/{dsid}/content?asOfDateTime="
