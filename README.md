@@ -103,3 +103,21 @@ Simple python scripts for those everyday, mundane Fedora tasks.
 ```
 >>> python run.py -o find_bad_books -p vanvactor
 ```
+
+## Get the History of a Datastream
+
+```
+>>> python run.py -o get_history -ds MODS -p vanvactor
+```
+
+## Get Version of Datastream at a Specfic Date
+
+```
+>>> python run.py -o get_datastream_at_date -ds MODS -p vanvactor -d 2017-09-01
+```
+
+## Get All Versions of a Datastream
+
+```
+>>> python run.py -o get_all_versions_of_datastream -ds MODS -p vanvactor
+```
