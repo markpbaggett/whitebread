@@ -34,6 +34,8 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
         instance.write_datastream_history(ds)
     elif choice == "get_datastream_at_date":
         instance.get_datastream_at_date(ds, as_of_date)
+    elif choice == "get_all_versions_of_datastream":
+        instance.get_datastream_history(ds)
     elif choice == "test_obj_mimes":
         x = instance.check_obj_mime_types()
         print("\nHere are the unique mime types in your result set:")
@@ -166,7 +168,8 @@ def main():
                                                                     "harvest_metadata_no_pages, grab_foxml, "
                                                                     "count_objects, update_gsearch_no_pages, "
                                                                     "purge_old_dsids, write_results, get_history,"
-                                                                    "get_datastream_at_date",
+                                                                    "get_datastream_at_date,"
+                                                                    "get_all_versions_of_datastream",
                         required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
     parser.add_argument("-xp", "--xpath", dest="xpath", help="Specify an xpath value to find. Used in update_label.")
