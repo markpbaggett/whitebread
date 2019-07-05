@@ -164,7 +164,7 @@ class Set:
             if r.status_code == 200:
                 json_response = json.loads(json.dumps(xmltodict.parse(r.text)['datastreamHistory']))
                 for version in json_response['datastreamProfile']:
-                    version_title = version['dsVersionID'].replace('.', '_')
+                    version_title = version['dsCreateDate']
                     current_version = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
                                                    f"objects/{result}/datastreams/{dsid}/content?asOfDateTime="
                                                    f"{version['dsCreateDate']}",
