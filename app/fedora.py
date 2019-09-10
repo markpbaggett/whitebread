@@ -9,6 +9,7 @@ import collections
 import xmltodict
 from bs4 import BeautifulSoup
 import json
+import urllib.request
 
 
 class Set:
@@ -286,8 +287,8 @@ class Set:
         return mime_types
 
     def purge_all_but_newest_dsid(self, datastream):
-        user_input = input(f"\n\nAre you sure you want to delete all but the newest {datastream} for each object in the "
-                           f"collection? [y/N] ")
+        user_input = input(f"\n\nAre you sure you want to delete all but the newest {datastream} for each object in "
+                           f"the collection? [y/N] ")
         if user_input == "y":
             with open(self.settings["log_file"], "w") as log_file:
                 for result in tqdm(self.results):
@@ -337,7 +338,8 @@ class Record:
     def update_fgs_label(self, xpath="", page=None):
         if page is None:
             mods_path = f"{self.settings['islandora_path']}/islandora/object/{self.pid}/datastream/MODS/"
-            document = etree.parse(mods_path)
+            opener = urllib.request.build_opener()
+            document = etree.parse(opener.open(mods_path))
             label_path = document.xpath(xpath, namespaces={"mods": "http://www.loc.gov/mods/v3"})
             if len(label_path) > 0:
                 print(f"Changing fgslabel for {self.pid} to {label_path[0].text}.")
@@ -377,8 +379,8 @@ class Record:
         return
 
     def get_parent_label(self, xpath):
-        mods = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{self.pid}/" \
-                    f"datastreams/MODS/content", auth=(self.settings['username'], self.settings['password']))
+        mods = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{self.pid}/"
+                            f"datastreams/MODS/content", auth=(self.settings['username'], self.settings['password']))
         document = etree.fromstring(mods.content)
         label_path = document.xpath(xpath, namespaces={"mods": "http://www.loc.gov/mods/v3"})
         return label_path[0].text
