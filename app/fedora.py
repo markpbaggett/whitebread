@@ -263,8 +263,11 @@ class Set:
         for result in self.results:
             new_record = Record(result)
             foxml = new_record.grab_foxml()
-            with open(f"{self.settings['destination_directory']}/{result}.xml", "w") as new_file:
-                new_file.write(foxml)
+            try:
+                with open(f"{self.settings['destination_directory']}/{result}.xml", "w") as new_file:
+                    new_file.write(foxml)
+            except:
+                pass
         return
 
     def test_embargos(self):
