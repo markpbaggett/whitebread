@@ -63,6 +63,11 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
         for pid in memberships:
             instance.results.remove(pid["pid"])
         instance.harvest_metadata(ds)
+    elif choice == "harvest_thumbnails_no_pages":
+        memberships = instance.find_rels_ext_relationship("isMemberOf")
+        for pid in memberships:
+            instance.results.remove(pid["pid"])
+        instance.grab_other('TN')
     elif choice == "find_bad_books":
         # Set some variables
         if predicate is None:
@@ -169,7 +174,8 @@ def main():
                                                                     "count_objects, update_gsearch_no_pages, "
                                                                     "purge_old_dsids, write_results, get_history,"
                                                                     "get_datastream_at_date,"
-                                                                    "get_all_versions_of_datastream",
+                                                                    "get_all_versions_of_datastream,"
+                                                                    "harvest_thumbnails_no_pages",
                         required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
     parser.add_argument("-xp", "--xpath", dest="xpath", help="Specify an xpath value to find. Used in update_label.")
