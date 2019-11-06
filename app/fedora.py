@@ -14,6 +14,13 @@ import urllib.request
 
 class Set:
     def __init__(self, search_string, yaml_settings):
+        """Initializes an instance of a Set with a search string and contents of a yaml config.
+
+        Args:
+            search_string (str): A fedora search string to find PIDS related to a query.
+            yaml_settings (dict): A dict of various setting predefined by the user in a config file.
+
+        """
         self.size = 0
         self.results = []
         self.request = search_string
@@ -27,6 +34,20 @@ class Set:
         return f"A set of records based on the following http request:\n\t{self.request}."
 
     def populate(self):
+        """Populates the results property of the Sets instance.
+
+        Populates the results property of the Sets instance with every pid that is associated with a request. The
+        results property is intended to be used by all other methods to determine which pids the method should be run
+        against.
+
+        Returns:
+            None
+
+        Examples:
+            >>>Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).populate()
+            None
+
+        """
         document = etree.parse(f"{self.request}{self.token}")
         token = document.xpath('//types:token', namespaces={"types": "http://www.fedora.info/definitions/1/0/types/"})
         results = document.findall('//{http://www.fedora.info/definitions/1/0/types/}pid')
@@ -41,6 +62,18 @@ class Set:
         return
 
     def count_objects(self):
+        """Returns number of pids that match query.
+
+        Return the length of the list of pids that match a query.
+
+        Returns:
+             int: The number of pids that match a query.
+
+        Examples:
+            >>>Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).populate()
+            62000
+
+        """
         return len(self.results)
 
     def harvest_metadata(self, dsid=None):
@@ -275,7 +308,7 @@ class Set:
             None
 
         Examples:
-            >>> Sets.get_datastream_report()
+            >>> Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).get_datastream_report()
             {'RELS-EXT': {'count': 3, 'pids': ['test:4', 'test:5', 'test:6']}, 'MODS': {'count': 3, 'pids': ['test:4',
             'test:5', 'test:6']}, 'DC': {'count': 3, 'pids': ['test:4', 'test:5', 'test:6']}, 'OBJ': {'count': 2,
             'pids': ['test:4', 'test:6']}, 'TECHMD': {'count': 2, 'pids': ['test:4', 'test:6']}, 'TN': {'count': 3,
