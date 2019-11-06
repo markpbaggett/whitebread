@@ -248,15 +248,19 @@ class Set:
         return membership_list
 
     def list_dsids(self):
+        unique_dsids = []
         for result in tqdm(self.results):
-            print(f"Finding dsids for {result}.\n")
             url = f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/" \
                   f"datastreams?profiles=true"
             r = requests.get(url, auth=(self.settings["gsearch_username"], self.settings["gsearch_password"]))
             if r.status_code == 200:
-                print(r.text)
+                object_datastreams = json.loads(json.dumps(xmltodict.parse(r.text)))
+                for object_datastream in object_datastreams['objectDatastreams']['datastreamProfile']:
+                    if object_datastream['@dsID'] not in unique_dsids:
+                        unique_dsids.append(object_datastream['@dsID'])
             else:
                 print(r.status_code)
+        print(f'The following unique dsids were found in your query: \n{unique_dsids}')
         return
 
     def grab_foxml(self):
