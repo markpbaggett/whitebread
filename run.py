@@ -22,6 +22,8 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
         instance.mark_as_missing(ds)
     elif choice == "list_dsids":
         instance.list_dsids()
+    elif choice == "get_datastream_report":
+        instance.get_datastream_report()
     elif choice == "get_relationships":
         instance.get_relationships()
     elif choice == "grab_other":
@@ -175,7 +177,7 @@ def main():
                                                                     "purge_old_dsids, write_results, get_history,"
                                                                     "get_datastream_at_date,"
                                                                     "get_all_versions_of_datastream,"
-                                                                    "grab_thumbnails_no_pages",
+                                                                    "grab_thumbnails_no_pages, get_datastream_report",
                         required=True)
     parser.add_argument("-r", "--relationship", dest="relationship", help="Specify the relationship to check for.")
     parser.add_argument("-xp", "--xpath", dest="xpath", help="Specify an xpath value to find. Used in update_label.")

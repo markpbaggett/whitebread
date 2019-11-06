@@ -263,6 +263,41 @@ class Set:
         print(f'The following unique dsids were found in your query: \n{unique_dsids}')
         return
 
+    def get_datastream_report(self):
+        """Prints a report on each datastream in a query.
+
+        Prints a dict that includes how many times each dictionary is found and what pids it is associated with.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Examples:
+            >>> Sets.get_datastream_report()
+            {'RELS-EXT': {'count': 3, 'pids': ['test:4', 'test:5', 'test:6']}, 'MODS': {'count': 3, 'pids': ['test:4',
+            'test:5', 'test:6']}, 'DC': {'count': 3, 'pids': ['test:4', 'test:5', 'test:6']}, 'OBJ': {'count': 2,
+            'pids': ['test:4', 'test:6']}, 'TECHMD': {'count': 2, 'pids': ['test:4', 'test:6']}, 'TN': {'count': 3,
+            'pids': ['test:4', 'test:5', 'test:6']}, 'MEDIUM_SIZE': {'count': 2, 'pids': ['test:4', 'test:6']}}
+
+        """
+        unique_datastreams = {}
+        for result in tqdm(self.results):
+            url = f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/" \
+                  f"datastreams?profiles=true"
+            r = requests.get(url, auth=(self.settings["gsearch_username"], self.settings["gsearch_password"]))
+            if r.status_code == 200:
+                object_datastreams = json.loads(json.dumps(xmltodict.parse(r.text)))
+                for object_datastream in object_datastreams['objectDatastreams']['datastreamProfile']:
+                    if object_datastream['@dsID'] not in unique_datastreams.keys():
+                        unique_datastreams[object_datastream['@dsID']] = {'count': 1, 'pids': [object_datastream['@pid']]}
+                    else:
+                        unique_datastreams[object_datastream['@dsID']]['count'] += 1
+                        unique_datastreams[object_datastream['@dsID']]['pids'].append(object_datastream['@pid'])
+        print(unique_datastreams)
+        return
+
     def grab_foxml(self):
         for result in self.results:
             new_record = Record(result)
