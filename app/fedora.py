@@ -118,13 +118,24 @@ class Set:
         return {"Attempted Downloads": len(self.results), "dsid": dsid, "errors": errors}
 
     def find_content_types(self):
+        """Returns all content models found in a request.
+
+        Returns a list of all content types found in a current request.
+
+        Returns:
+            list: A list of all content types found in a request.
+
+        Examples:
+            >>> Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).find_content_types()
+            ['sp_basic_image', 'compoundCModel']
+
+        """
         content_types = []
         for result in tqdm(self.results):
             x = Record(result).find_content_type()
             if x not in content_types:
                 content_types.append(x)
-        print(content_types)
-        return
+        return content_types
 
     def grab_images(self, dsid=None):
         if self.settings["destination_directory"] in os.listdir("."):

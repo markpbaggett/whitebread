@@ -29,7 +29,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
     elif choice == "grab_other":
         instance.grab_other(ds)
     elif choice == "find_content_type":
-        instance.find_content_types()
+        print(instance.find_content_types())
     elif choice == "write_results":
         instance.write_results_to_file()
     elif choice == "get_history":
