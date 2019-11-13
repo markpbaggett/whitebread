@@ -252,13 +252,34 @@ class Set:
         return {"Attempted Downloads": self.results, "dsid": dsid, "format": result_format, "errors": errors,
                 "destination_directory": self.settings['destination_directory']}
 
-    def get_datastream_at_date(self, dsid=None, a_date="yyyy-MM-dd"):
+    def get_datastream_at_date(self, dsid, a_date="yyyy-MM-dd"):
+        """Serializes to disk a datastream for all results at a specific date.
+
+        Requires a datastream id (dsid) and a data (a_date) and downloads that version of the datastream for all
+        matching results.
+
+        Args:
+            dsid (str): The datastream id that you want to serialize to disk.
+            a_date (str): The date that you want to request as yyyy-MM-dd.
+
+        Returns:
+            dict: A dict with the PIDs attempted to download, the total number of pids attempted to download, the
+            datastream id, the date that was requested, the destination directory where any successful downloads
+            were serialized, and a list of errors as tuples containing the PID and the http status code associated
+            with the request.
+
+        Examples:
+            >>> Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).get_datastream_at_date('MODS',
+            ... '2019-11-12')
+            {'Attempted downloads': ['test:4', 'test:5', 'test:6'], 'Downloads attempted': 3, 'dsid': 'MODS',
+            'date requested': '2019-11-12', 'errors': [], 'destination_directory': 'output'}
+
+        """
         if self.settings["destination_directory"] in os.listdir("."):
             pass
         else:
             os.mkdir(self.settings["destination_directory"])
-        if dsid is None:
-            dsid = self.settings["default_dsid"]
+        errors = []
         for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content?asOfDateTime={a_date}",
@@ -269,8 +290,10 @@ class Set:
                 with open(f"{self.settings['destination_directory']}/{new_name}.{ext}", 'wb') as other:
                     other.write(r.content)
             else:
-                print(f"Failed to download {dsid} for {result} with {r.status_code}.")
-        return
+                errors.append((result, r.status_code))
+        return {"Attempted downloads": self.results, "Downloads attempted": len(self.results), "dsid": dsid,
+                "date requested": a_date, "errors": errors,
+                "destination_directory": self.settings['destination_directory']}
 
     def write_all_versions_of_datastream(self, dsid=None):
         if self.settings["destination_directory"] in os.listdir("."):

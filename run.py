@@ -37,7 +37,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
     elif choice == "get_history":
         print(instance.write_datastream_history(ds))
     elif choice == "get_datastream_at_date":
-        instance.get_datastream_at_date(ds, as_of_date)
+        print(instance.get_datastream_at_date(ds, as_of_date))
     elif choice == "get_all_versions_of_datastream":
         instance.write_all_versions_of_datastream(ds)
     elif choice == "test_obj_mimes":
