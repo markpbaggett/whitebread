@@ -137,22 +137,42 @@ class Set:
                 content_types.append(x)
         return content_types
 
-    def grab_images(self, dsid=None):
+    def grab_images(self, dsid="TN"):
+        """Attempts to serialize an image to disk. (Deprecated)
+
+        This is an old method that was used for downloading images.  I highly recommend using grab_binary() instead.
+
+        Args:
+            dsid (str): The image datastream id to download.  Defaults to TN.
+
+        Returns:
+            dict: A dict with the number of attempted downloads, the datastream id that was passed, and a list of errors
+            as tuples with the PID and the http status code.
+
+        Examples:
+            >>> Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).grab_images("TN")
+            {'Attempted Downloads': 3, 'dsid': 'TN', 'errors': []}
+
+        """
         if self.settings["destination_directory"] in os.listdir("."):
             pass
         else:
             os.mkdir(self.settings["destination_directory"])
         if dsid is None:
             dsid = self.settings["default_dsid"]
+        errors = []
         for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
                              auth=(self.settings['username'], self.settings['password']))
-            ext = r.headers["Content-Type"].split(";")[0].split("/")[1]
-            in_file = Image.open(BytesIO(r.content))
-            new_name = result.replace(":", "_")
-            in_file.save(f"{self.settings['destination_directory']}/{new_name}.{ext}")
-        return
+            if r.status_code == 200:
+                ext = r.headers["Content-Type"].split(";")[0].split("/")[1]
+                in_file = Image.open(BytesIO(r.content))
+                new_name = result.replace(":", "_")
+                in_file.save(f"{self.settings['destination_directory']}/{new_name}.{ext}")
+            else:
+                errors.append((result, r.status_code))
+        return {"Attempted Downloads": len(self.results), "dsid": dsid, "errors": errors}
 
     def grab_other(self, dsid=None):
         if self.settings["destination_directory"] in os.listdir("."):

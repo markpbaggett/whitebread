@@ -6,7 +6,7 @@ from time import sleep
 
 def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_of_date=None):
     if choice == "grab_images":
-        instance.grab_images(ds)
+        print(instance.grab_images(ds))
     elif choice == "update_gsearch":
         instance.update_gsearch()
     elif choice == "update_gsearch_no_pages":
