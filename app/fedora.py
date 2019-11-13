@@ -76,13 +76,31 @@ class Set:
         """
         return len(self.results)
 
-    def harvest_metadata(self, dsid=None):
-        if dsid is None:
-            dsid = self.settings["default_dsid"]
+    def harvest_metadata(self, dsid="MODS"):
+        """Harvests metadata and other text or xml datastreams.
+
+        Accepts a datastream id (MODS by default) and serializes the datastream to disk according to the contents of
+        self.results
+
+        Args:
+            dsid (str): The datastream id of the objects you want to download and serialize to disk. MODS by default.
+
+        Returns:
+            dict: A dict with the number of files in attempted to download, the dsid that was used, and a list of errors
+            as tuples with the PID and the status code of the request.
+
+        Examples:
+            >>> Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).harvest_metadata("MODS")
+            {'Attempted Downloads': 3, 'dsid': 'MODS', 'errors': []}
+            >>> Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).harvest_metadata("DARWIN")
+            {'Attempted Downloads': 3, 'dsid': 'DARWIN', 'errors': [('test:4', 404), ('test:5', 404), ('test:6', 404)]}
+
+        """
         if self.settings["destination_directory"] in os.listdir("."):
             pass
         else:
             os.mkdir(self.settings["destination_directory"])
+        errors = []
         for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
@@ -94,9 +112,10 @@ class Set:
                 with open(f"{self.settings['destination_directory']}/{new_name}.{ext}", "w") as new_file:
                     new_file.write(r.text)
             else:
+                errors.append((result, r.status_code))
                 print(f"Could not harvest metadata for {result}: {r.status_code}.")
         print(f"\n\nDownloaded {len(self.results)} {dsid} records.")
-        return
+        return {"Attempted Downloads": len(self.results), "dsid": dsid, "errors": errors}
 
     def find_content_types(self):
         content_types = []
