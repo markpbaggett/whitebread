@@ -377,7 +377,17 @@ class Set:
                 "destination_directory": self.settings['destination_directory']}
 
     def size_of_set(self):
-        return f"Total records: {len(self.results)}"
+        """Returns the total number of results in a query.
+
+        Returns:
+            int: the number of results in a query
+
+        Examples:
+            >>> Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).size_of_set()
+            3
+
+        """
+        return len(self.results)
 
     def update_gsearch(self):
         successes = 0
