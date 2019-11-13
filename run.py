@@ -10,7 +10,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
     if choice == "grab_images":
         print(instance.grab_images(ds))
     elif choice == "update_gsearch":
-        instance.update_gsearch()
+        print(instance.update_gsearch())
     elif choice == "update_gsearch_no_pages":
         memberships = instance.find_rels_ext_relationship("isMemberOf")
         for pid in memberships:

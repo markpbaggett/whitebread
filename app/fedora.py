@@ -390,7 +390,23 @@ class Set:
         return len(self.results)
 
     def update_gsearch(self):
-        successes = 0
+        """Attempts to update Solr documents via fedoragsearch.
+
+        Attempts to update Solr documents via fedoragsearch for all results in a query.  Also, writes to a log called
+        gsearch_log.txt all successes and failures.
+
+        Returns:
+            dict: A dict of PIDs attempted, total attempts, PIDS successfully updated, total updated, a list of errors
+            as tuples with the PID and its http status code, a total number of failed updates.
+
+        Examples:
+            >>> Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).update_gsearch()
+            {'PIDs attempted': ['test:4', 'test:5', 'test:6'], 'Total attempts': 3, 'PIDs updated': ['test:4', 'test:5',
+             'test:6'], 'Total updated': 3, 'errors': [], 'Total failed': 0}
+
+        """
+        successes = []
+        errors = []
         print("\n\nUpdating gsearch\n")
         with open("gsearch_log.txt", "w") as my_log:
             for result in tqdm(self.results):
@@ -404,14 +420,16 @@ class Set:
                         if tag.contents[0] == "Updated number of index documents: 1":
                             success = True
                     if success is True:
-                        successes += 1
+                        successes.append(result)
                         my_log.write(f"Successfully updated Solr document for {result}.\n")
                     else:
+                        errors.append((result, r.status_code))
                         my_log.write(f"Failed to update Solr document for {result}.\n")
                 else:
+                    errors.append((result, r.status_code))
                     my_log.write(f"Failed to update Solr document for {result} with {r.status_code}.\n")
-        print(f"\nSuccessfully updated {successes} records.")
-        return
+        return {"PIDs attempted": self.results, "Total attempts": len(self.results), "PIDs updated": successes,
+                "Total updated": len(successes), "errors": errors, "Total failed": len(errors)}
 
     def mark_as_missing(self, dsid=None):
         print(f"Finding results that are missing a {dsid} datastream.")
