@@ -5,6 +5,8 @@ from time import sleep
 
 
 def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_of_date=None, yaml_settings=None):
+    if ds is None:
+        ds = yaml_settings["default_dsid"]
     if choice == "grab_images":
         print(instance.grab_images(ds))
     elif choice == "update_gsearch":
@@ -27,15 +29,13 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
     elif choice == "get_relationships":
         instance.get_relationships()
     elif choice == "grab_other":
-        if ds is None:
-            ds = yaml_settings["default_dsid"]
         print(instance.grab_binary(ds))
     elif choice == "find_content_type":
         print(instance.find_content_types())
     elif choice == "write_results":
         instance.write_results_to_file()
     elif choice == "get_history":
-        instance.write_datastream_history(ds)
+        print(instance.write_datastream_history(ds))
     elif choice == "get_datastream_at_date":
         instance.get_datastream_at_date(ds, as_of_date)
     elif choice == "get_all_versions_of_datastream":

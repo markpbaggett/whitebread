@@ -211,16 +211,36 @@ class Set:
                 errors.append((result, r.status_code))
         return {"Attempted Downloads": self.results, "dsid": dsid, "errors": errors}
 
-    def write_datastream_history(self, dsid=None):
+    def write_datastream_history(self, dsid, result_format="xml"):
+        """Serializes the datastream history of a specific dsid for all results in a query.
+
+        Accepts a datastream id and a result format (xml by default) and serializes the history to indvidual files on
+        disk.
+
+        Args:
+            dsid (str): The datastream id to retrieve history on.
+            result_format (str): The result format to serialize to disk as. xml (default) or html
+
+        Returns:
+            dict: A dict with the number of attempted history files to serialize, the dsid for the query, the format of
+            the serialization, the destination directory where the files are serialized, and a list of any errors that
+            occurred as tuples with the PID and the http status code.
+
+        Examples:
+            >>> Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).write_datastream_history('TN',
+            ... 'xml')
+            {'Attempted Downloads': ['test:4', 'test:5', 'test:6'], 'dsid': 'TN', 'format': 'xml', 'errors': [],
+            'destination_directory': 'output'}
+
+        """
         if self.settings["destination_directory"] in os.listdir("."):
             pass
         else:
             os.mkdir(self.settings["destination_directory"])
-        if dsid is None:
-            dsid = self.settings["default_dsid"]
+        errors = []
         for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
-                             f"datastreams/{dsid}/history",
+                             f"datastreams/{dsid}/history?format={result_format}",
                              auth=(self.settings['username'], self.settings['password']))
             if r.status_code == 200:
                 new_name = result.replace(":", "_")
@@ -228,8 +248,9 @@ class Set:
                 with open(f"{self.settings['destination_directory']}/{new_name}.{ext}", "w") as new_file:
                     new_file.write(r.text)
             else:
-                print(f"Could not harvest metadata for {result}: {r.status_code}.")
-        return
+                errors.append((result, r.status_code))
+        return {"Attempted Downloads": self.results, "dsid": dsid, "format": result_format, "errors": errors,
+                "destination_directory": self.settings['destination_directory']}
 
     def get_datastream_at_date(self, dsid=None, a_date="yyyy-MM-dd"):
         if self.settings["destination_directory"] in os.listdir("."):
