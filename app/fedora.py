@@ -295,13 +295,44 @@ class Set:
                 "date requested": a_date, "errors": errors,
                 "destination_directory": self.settings['destination_directory']}
 
-    def write_all_versions_of_datastream(self, dsid=None):
+    def write_all_versions_of_datastream(self, dsid):
+        """Serializes all versions of a datastream related to a query to disk.
+
+        Requires a datastream id (dsid) and serializes all versions of that datastream id related to a query to disk.
+        Files are named in this pattern:  PID_DATE.EXTENSION
+
+        Args:
+            dsid (str): the datastream id you want to serialize to disk.
+
+        Returns:
+            dict: A dict with the PIDs attempted to download, the count of the PIDs attempted to download, a list of the
+            files successfully serialized to disk, a list of errors as tuples with the PID and the http status code,
+            and the destination directory where the files were serialized.
+
+        Examples:
+            >>> Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).write_all_versions_of_datastream(
+            ... 'MODS')
+            {'Attempted downloads': ['test:4', 'test:5', 'test:6'], 'PIDs attempted': 3, 'dsid': 'MODS',
+            'serialized_files': ['test_4_2019-11-11T21:58:57.741Z.xml', 'test_4_2019-11-05T20:06:31.399Z.xml',
+            'test_4_2019-11-05T17:49:30.565Z.xml', 'test_5_2019-11-13T14:39:04.198Z.xml',
+            'test_5_2019-11-08T16:43:53.803Z.xml', 'test_5_2019-11-05T19:17:22.572Z.xml',
+            'test_6_2019-11-05T19:17:56.183Z.xml', 'test_6_2019-11-05T19:17:56.183Z.xml',
+            'test_6_2019-11-05T19:17:56.183Z.xml', 'test_6_2019-11-05T19:17:56.183Z.xml',
+            'test_6_2019-11-05T19:17:56.183Z.xml', 'test_6_2019-11-05T19:17:56.183Z.xml',
+            'test_6_2019-11-05T19:17:56.183Z.xml', 'test_6_2019-11-05T19:17:56.183Z.xml',
+            'test_6_2019-11-05T19:17:56.183Z.xml', 'test_6_2019-11-05T19:17:56.183Z.xml',
+            'test_6_2019-11-05T19:17:56.183Z.xml', 'test_6_2019-11-05T19:17:56.183Z.xml',
+            'test_6_2019-11-05T19:17:56.183Z.xml', 'test_6_2019-11-05T19:17:56.183Z.xml',
+            'test_6_2019-11-05T19:17:56.183Z.xml', 'test_6_2019-11-05T19:17:56.183Z.xml'], 'errors': [],
+            'destination_directory': 'output'}
+
+        """
         if self.settings["destination_directory"] in os.listdir("."):
             pass
         else:
             os.mkdir(self.settings["destination_directory"])
-        if dsid is None:
-            dsid = self.settings["default_dsid"]
+        errors = []
+        serialized_files = []
         for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/history?format=xml",
@@ -309,19 +340,41 @@ class Set:
             if r.status_code == 200:
                 json_response = json.loads(json.dumps(xmltodict.parse(r.text)['datastreamHistory']))
                 for version in json_response['datastreamProfile']:
-                    version_title = version['dsCreateDate']
-                    current_version = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
-                                                   f"objects/{result}/datastreams/{dsid}/content?asOfDateTime="
-                                                   f"{version['dsCreateDate']}",
-                                                   auth=(self.settings['username'], self.settings['password']))
-                    if current_version.status_code == 200:
-                        new_name = result.replace(":", "_")
-                        ext = current_version.headers["Content-Type"].split(";")[0].split("/")[1]
-                        with open(f"{self.settings['destination_directory']}/{new_name}_{version_title}.{ext}", 'wb') as other:
-                            other.write(current_version.content)
-                    else:
-                        print(f"Failed to download {dsid} for {result} with {current_version.status_code}.")
-        return
+                    if type(version) is dict:
+                        version_title = version['dsCreateDate']
+                        current_version = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
+                                                       f"objects/{result}/datastreams/{dsid}/content?asOfDateTime="
+                                                       f"{version['dsCreateDate']}",
+                                                       auth=(self.settings['username'], self.settings['password']))
+                        if current_version.status_code == 200:
+                            new_name = result.replace(":", "_")
+                            ext = current_version.headers["Content-Type"].split(";")[0].split("/")[1]
+                            with open(f"{self.settings['destination_directory']}/{new_name}_{version_title}.{ext}", 'wb') as other:
+                                other.write(current_version.content)
+                            serialized_files.append(f'{new_name}_{version_title}.{ext}')
+                        else:
+                            errors.append((f'{result}_{version_title}.'
+                                           f'{current_version.headers["Content-Type"].split(";")[0].split("/")[1]}',
+                                           r.status_code))
+                    elif type(version) is str:
+                        version_title = json_response['datastreamProfile']['dsCreateDate']
+                        current_version = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
+                                                       f"objects/{result}/datastreams/{dsid}/content?asOfDateTime="
+                                                       f"{json_response['datastreamProfile']['dsCreateDate']}",
+                                                       auth=(self.settings['username'], self.settings['password']))
+                        if current_version.status_code == 200:
+                            new_name = result.replace(":", "_")
+                            ext = current_version.headers["Content-Type"].split(";")[0].split("/")[1]
+                            with open(f"{self.settings['destination_directory']}/{new_name}_{version_title}.{ext}", 'wb') as other:
+                                other.write(current_version.content)
+                            serialized_files.append(f'{new_name}_{version_title}.{ext}')
+                        else:
+                            errors.append((f'{result}_{version_title}.'
+                                           f'{current_version.headers["Content-Type"].split(";")[0].split("/")[1]}',
+                                           r.status_code))
+        return {"Attempted downloads": self.results, "PIDs attempted": len(self.results), "dsid": dsid,
+                "serialized_files": serialized_files, "errors": errors,
+                "destination_directory": self.settings['destination_directory']}
 
     def size_of_set(self):
         return f"Total records: {len(self.results)}"

@@ -39,7 +39,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
     elif choice == "get_datastream_at_date":
         print(instance.get_datastream_at_date(ds, as_of_date))
     elif choice == "get_all_versions_of_datastream":
-        instance.write_all_versions_of_datastream(ds)
+        print(instance.write_all_versions_of_datastream(ds))
     elif choice == "test_obj_mimes":
         x = instance.check_obj_mime_types()
         print("\nHere are the unique mime types in your result set:")
