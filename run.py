@@ -4,7 +4,7 @@ from app.fedora import Set, Record
 from time import sleep
 
 
-def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_of_date=None):
+def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_of_date=None, yaml_settings=None):
     if choice == "grab_images":
         print(instance.grab_images(ds))
     elif choice == "update_gsearch":
@@ -27,7 +27,9 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
     elif choice == "get_relationships":
         instance.get_relationships()
     elif choice == "grab_other":
-        instance.grab_other(ds)
+        if ds is None:
+            ds = yaml_settings["default_dsid"]
+        print(instance.grab_binary(ds))
     elif choice == "find_content_type":
         print(instance.find_content_types())
     elif choice == "write_results":
@@ -69,7 +71,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
         memberships = instance.find_rels_ext_relationship("isMemberOf")
         for pid in memberships:
             instance.results.remove(pid["pid"])
-        instance.grab_other('TN')
+        instance.grab_binary('TN')
     elif choice == "find_bad_books":
         # Set some variables
         if predicate is None:
@@ -211,7 +213,7 @@ def main():
     print("\nPopulating results set.", end="", flush=True)
     while my_records.token is not None:
         my_records.populate()
-    choose_operation(operation, my_records, dsid, relationship, my_xpath, my_date)
+    choose_operation(operation, my_records, dsid, relationship, my_xpath, my_date, settings)
 
 
 if __name__ == "__main__":

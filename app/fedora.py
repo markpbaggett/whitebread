@@ -174,13 +174,30 @@ class Set:
                 errors.append((result, r.status_code))
         return {"Attempted Downloads": len(self.results), "dsid": dsid, "errors": errors}
 
-    def grab_other(self, dsid=None):
+    def grab_binary(self, dsid="OBJ"):
+        """ Serializes binaries to disk for a specific search.
+
+        Accepts a datastream ID (OBJ by default) and serializes it to disk for a specific search.
+
+        Args:
+            dsid (str): The id of the datastream you want to serialize to disk.
+
+        Returns:
+            dict: A dictionary with the PIDs of attempted downloads, the datastream id, and a list of errors as tuples
+            with the PID and http status code.
+
+        Examples:
+            >>> Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).grab_binary("TN")
+            {'Attempted Downloads': ['test:4', 'test:5', 'test:6'], 'dsid': 'TN', 'errors': []}
+            >>> Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).grab_binary("OBJ")
+            {'Attempted Downloads': ['test:4', 'test:5', 'test:6'], 'dsid': 'OBJ', 'errors': [('test:5', 404)]}
+
+        """
         if self.settings["destination_directory"] in os.listdir("."):
             pass
         else:
             os.mkdir(self.settings["destination_directory"])
-        if dsid is None:
-            dsid = self.settings["default_dsid"]
+        errors = []
         for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/"
                              f"datastreams/{dsid}/content",
@@ -191,8 +208,8 @@ class Set:
                 with open(f"{self.settings['destination_directory']}/{new_name}.{ext}", 'wb') as other:
                     other.write(r.content)
             else:
-                print(f"Failed to download {dsid} for {result} with {r.status_code}.")
-        return
+                errors.append((result, r.status_code))
+        return {"Attempted Downloads": self.results, "dsid": dsid, "errors": errors}
 
     def write_datastream_history(self, dsid=None):
         if self.settings["destination_directory"] in os.listdir("."):
