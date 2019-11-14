@@ -551,8 +551,7 @@ class Set:
                     else:
                         unique_datastreams[object_datastream['@dsID']]['count'] += 1
                         unique_datastreams[object_datastream['@dsID']]['pids'].append(object_datastream['@pid'])
-        print(unique_datastreams)
-        return
+        return unique_datastreams
 
     def grab_foxml(self):
         for result in self.results:

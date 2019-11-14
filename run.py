@@ -25,7 +25,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
     elif choice == "list_dsids":
         print(instance.list_dsids()['Unique dsids'])
     elif choice == "get_datastream_report":
-        instance.get_datastream_report()
+        print(instance.get_datastream_report())
     elif choice == "get_relationships":
         instance.get_relationships()
     elif choice == "grab_other":
