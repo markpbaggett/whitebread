@@ -431,17 +431,34 @@ class Set:
         return {"PIDs attempted": self.results, "Total attempts": len(self.results), "PIDs updated": successes,
                 "Total updated": len(successes), "errors": errors, "Total failed": len(errors)}
 
-    def mark_as_missing(self, dsid=None):
-        print(f"Finding results that are missing a {dsid} datastream.")
+    def find_objects_missing_datastream(self, dsid):
+        """Find PIDs without a certain dsid.
+
+        Requires a datasteam id as dsid and finds all PIDs in query results missing that datastream.
+
+        Args:
+            dsid (str): A datastream id.
+
+        Returns:
+            dict:  A dict with a list of PIDs checked, the dsid checked, a list of PIDs missing the dsid, the total
+            number of PIDs checked, and the total number of PIDs missing the dsid.
+
+        Examples:
+            >>> Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).find_objects_missing_datastream(
+            ... 'OBJ')
+            {'PIDs Checked': ['test:4', 'test:5', 'test:6'], 'dsid': 'OBJ', 'PIDs missing dsid': ['test:5'],
+            'Total checked': 3, 'Total missing dsid:': 1}
+
+        """
         missing = []
-        for i in tqdm(self.results):
+        for result in tqdm(self.results):
             r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/"
-                             f"objects/{i}/datastreams/{dsid}", auth=(f"{self.settings['username']}",
-                                                                      f"{self.settings['password']}"))
+                             f"objects/{result}/datastreams/{dsid}",
+                             auth=(self.settings['username'], self.settings['password']))
             if r.status_code != 200:
-                missing.append(i)
-        print(f"{len(missing)} of {len(self.results)} were missing a {dsid} datastream.")
-        return missing
+                missing.append(result)
+        return {"PIDs Checked": self.results, "dsid": dsid, "PIDs missing dsid": missing,
+                "Total checked": len(self.results), "Total missing dsid:": len(missing)}
 
     def get_relationships(self):
         for i in tqdm(self.results):

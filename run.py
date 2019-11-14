@@ -21,7 +21,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
     elif choice == "harvest_metadata":
         instance.harvest_metadata(ds)
     elif choice == "find_missing":
-        instance.mark_as_missing(ds)
+        print(instance.find_objects_missing_datastream(ds))
     elif choice == "list_dsids":
         instance.list_dsids()
     elif choice == "get_datastream_report":
@@ -81,7 +81,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
         # Find all memberships for results matching query
         all_memberships = instance.find_rels_ext_relationship(predicate)
         # Find objects missing the datastream in question
-        objects_missing_dsid = instance.mark_as_missing(ds)
+        objects_missing_dsid = instance.find_objects_missing_datastream(ds)['PIDs missing dsid']
         # Add objects missing the dsid in question if they aren't already queued for removal
         for i in objects_missing_dsid:
             x = review_memberships(i, all_memberships, predicate)
