@@ -23,7 +23,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
     elif choice == "find_missing":
         print(instance.find_objects_missing_datastream(ds))
     elif choice == "list_dsids":
-        instance.list_dsids()
+        print(instance.list_dsids()['Unique dsids'])
     elif choice == "get_datastream_report":
         instance.get_datastream_report()
     elif choice == "get_relationships":

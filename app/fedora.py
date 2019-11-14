@@ -490,7 +490,21 @@ class Set:
         return membership_list
 
     def list_dsids(self):
+        """Lists all dsids in a result set.
+
+        Returns:
+            dict: A dict with the list of PIDs checked, the total number of PIDs checked, a list of unique dsids found,
+            a list of errors encountered as tuples with the PID and http status code, the total number of errors, and
+            the total number of dsids found.
+
+        Examples:
+            >>> Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).list_dsids()
+            {'PIDs checked': ['test:4', 'test:5', 'test:6'], 'Total checked': 3, 'Unique dsids': ['RELS-EXT', 'MODS',
+            'DC', 'OBJ', 'TECHMD', 'TN', 'MEDIUM_SIZE'], 'Errors': [], 'Total errors': 0, 'Total dsids': 7}
+
+        """
         unique_dsids = []
+        errors = []
         for result in tqdm(self.results):
             url = f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{result}/" \
                   f"datastreams?profiles=true"
@@ -501,9 +515,9 @@ class Set:
                     if object_datastream['@dsID'] not in unique_dsids:
                         unique_dsids.append(object_datastream['@dsID'])
             else:
-                print(r.status_code)
-        print(f'The following unique dsids were found in your query: \n{unique_dsids}')
-        return
+                errors.append((result, r.status_code))
+        return {"PIDs checked": self.results, "Total checked": len(self.results), "Unique dsids": unique_dsids,
+                "Errors": errors, "Total errors": len(errors), "Total dsids": len(unique_dsids)}
 
     def get_datastream_report(self):
         """Prints a report on each datastream in a query.
