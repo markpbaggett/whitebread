@@ -17,7 +17,7 @@ def choose_operation(choice, instance, ds=None, predicate=None, xpath=None, as_o
             instance.results.remove(pid["pid"])
         instance.update_gsearch()
     elif choice == "grab_foxml":
-        instance.grab_foxml()
+        print(instance.grab_foxml())
     elif choice == "harvest_metadata":
         instance.harvest_metadata(ds)
     elif choice == "find_missing":

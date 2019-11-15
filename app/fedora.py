@@ -554,15 +554,33 @@ class Set:
         return unique_datastreams
 
     def grab_foxml(self):
-        for result in self.results:
+        """Serializes FOXML files to disk.
+
+        Serializes FOXML files to disk for all results in a query.
+
+        Returns:
+            dict: A dict with the PIDs that were processed, the FOXML files serialized, a list of errors as tuples with
+            PIDs and http staus codes, and the destination directory for where these were serialized.
+
+        Examples:
+            >>> Set('http://localhost:8080', yaml.safe_load(open("config.yml", "r"))).get_datastream_report()
+            {'PIDs processed': ['test:4', 'test:5', 'test:6'], 'FOXML files': ['test:4.xml', 'test:5.xml',
+            'test:6.xml'], 'errors': [], 'destination_directory': 'output'}
+
+        """
+        errors = []
+        successes = []
+        for result in tqdm(self.results):
             new_record = Record(result)
             foxml = new_record.grab_foxml()
-            try:
+            if foxml['status'] is "Success":
+                successes.append(f'{result}.xml')
                 with open(f"{self.settings['destination_directory']}/{result}.xml", "w") as new_file:
-                    new_file.write(foxml)
-            except:
-                pass
-        return
+                    new_file.write(foxml['foxml_contents'])
+            else:
+                errors.append(foxml['error'])
+        return {"PIDs processed": self.results, "FOXML files": successes, "errors": errors,
+                "destination_directory": self.settings['destination_directory']}
 
     def test_embargos(self):
         for result in self.results:
@@ -682,12 +700,24 @@ class Record:
         label_path = document.xpath(xpath, namespaces={"mods": "http://www.loc.gov/mods/v3"})
         return label_path[0].text
 
-    def grab_foxml(self, foxml_contents=None):
+    def grab_foxml(self):
+        """Requests FOXML record for a PID.
+
+        Returns:
+            dict: A dict with whether the request was a success or failed, the foxml_contents (if successful), and
+            error (if failed).
+
+        """
+        status = {}
         r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{self.pid}/export",
                          auth=(f"{self.settings['username']}", f"{self.settings['password']}"))
         if r.status_code == 200:
-            foxml_contents = r.text
-        return foxml_contents
+            status['status'] = "Success"
+            status['foxml_contents'] = r.text
+        else:
+            status['status'] = "Failed"
+            status['error'] = (self.pid, r.status_code)
+        return status
 
     def am_i_embargoed(self):
         r = requests.get(f"{self.settings['fedora_path']}:{self.settings['port']}/fedora/objects/{self.pid}/"
