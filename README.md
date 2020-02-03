@@ -1,5 +1,13 @@
 # Whitebread Fedora
 
+**Note**: This project has been deprecated and is now archived in favor of a statically compiled application built in nim. 
+For an actively developed and maintained project that has 95% of the functionality here plus much more, please see 
+[moldybread](https://github.com/markpbaggett/moldybread).  Compilied binaries for Linux x86 can be found in the
+[releases](https://github.com/markpbaggett/moldybread/releases) section.  If you're using another another architecture
+instructions for compiling can be found in the 
+[README](https://github.com/markpbaggett/moldybread/blob/master/README.rst). All other documentation can be found online
+in the project's [documenation respository](https://markpbaggett.github.io/moldybread/moldybread.html).
+
 Simple python scripts for those everyday, mundane Fedora tasks.
 
 ## Count Matching Objects
